@@ -11,6 +11,7 @@ export function toast(message,error=false){
 }
 let dirty=false;
 export function clearDirty(){dirty=false;}
+export function hasUnsavedChanges(){return dirty;}
 export function initStudio({request,action,saved,showImage}){
   const panels=[...document.querySelectorAll('[data-admin-panel]')],menu=document.querySelector('[data-admin-menu]'),sidebar=document.querySelector('#admin-sidebar');
   const mobile=matchMedia('(max-width:800px)');
@@ -27,7 +28,7 @@ export function initStudio({request,action,saved,showImage}){
   }
   document.addEventListener('click',event=>{
     const link=event.target.closest('a[href]');if(!link)return;
-    const url=new URL(link.href);if(url.origin!==location.origin||url.pathname!=='/admin'||!url.hash)return;
+    const url=new URL(link.href);if(link.hasAttribute('data-inbox-refresh')||url.origin!==location.origin||url.pathname!=='/admin'||!url.hash)return;
     if(!document.getElementById(url.hash.slice(1)))return;
     event.preventDefault();history.pushState(null,'',url.hash);activate(url.hash);
   });

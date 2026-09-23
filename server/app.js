@@ -931,9 +931,8 @@ export async function createApp(options = {}) {
           mailConfigured:
             mail.configured,
           replyKey: randomUUID,
-          newCount
-          ,username:_req.session.username,
-          recentActivity:await db.collection('admin_activity').find({}).sort({created_at:-1}).limit(12).toArray()
+          newCount,
+          username:_req.session.username
         });
       } catch (error) {
         next(error);

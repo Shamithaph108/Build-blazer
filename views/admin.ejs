@@ -16,7 +16,8 @@
 
   <div id="application-notice" class="notice notification-strip" role="status" data-count="<%= newCount %>" data-latest="<%= submissions[0]?.id || '' %>">
     <span id="inbox-count"><%= newCount %> unread applications or messages.</span>
-    <a href="/admin#join-requests">Refresh inbox</a>
+    <a href="/admin#join-requests" data-inbox-refresh="join-requests">Refresh Join requests</a>
+    <a href="/admin#contact-messages" data-inbox-refresh="contact-messages">Refresh Contact messages</a>
   </div>
 
   <section id="overview" class="admin-panel editor-section" data-admin-panel>

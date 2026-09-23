@@ -70,7 +70,7 @@ export function studioRoutes(app,{db,requireAdmin,auth,listContent}){
   });
   app.post('/api/admin/password',requireAdmin,rateLimit({windowMs:60*60*1000,limit:10,standardHeaders:'draft-8',legacyHeaders:false,message:{error:'Too many password-change attempts. Try again in an hour.'}}),async(req,res)=>{
     const {currentPassword,newPassword,confirmPassword}=req.body;
-    if(typeof currentPassword!=='string'||currentPassword.length>256||typeof newPassword!=='string'||newPassword.length<16||newPassword.length>256||newPassword!==confirmPassword)return res.status(422).json({error:'Use a new password of 16–256 characters and a matching confirmation.'});
+    if(typeof currentPassword!=='string'||currentPassword.length>256||typeof newPassword!=='string'||newPassword.length<8||newPassword.length>256||newPassword!==confirmPassword)return res.status(422).json({error:'Use a new password of 8–256 characters and a matching confirmation.'});
     const admin=await db.collection('admins').findOne({username:req.session.username});
     if(!admin||!await verifyPassword(currentPassword,admin.password_hash))return res.status(403).json({error:'Your current password is incorrect.'});
     const result=await db.collection('admins').updateOne({username:admin.username,password_hash:admin.password_hash},{$set:{password_hash:await hashPassword(newPassword)}});

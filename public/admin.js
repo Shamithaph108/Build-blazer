@@ -1,6 +1,6 @@
-import {initStudio,confirmAction,toast,clearDirty} from './admin-studio.js';
+import {initStudio,confirmAction,toast,clearDirty,hasUnsavedChanges} from './admin-studio.js';
 const csrf=document.querySelector('meta[name="csrf-token"]').content;
-let pageLeaving=false;
+let pageLeaving=false,pendingActions=0;
 async function request(url,method,body) {
   const response=await fetch(url,{method,headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(body)});
   const result=await response.json().catch(()=>({error:'The server could not complete this request. Please try again.'}));
@@ -130,8 +130,9 @@ async function action(container,run) {
   const status=container.querySelector(':scope > .editor-status') || container.querySelector('.editor-status');
   const buttons=[...container.querySelectorAll('button')],prior=buttons.map(button=>button.disabled);
   buttons.forEach(button=>button.disabled=true);status.classList.remove('field-error');status.textContent='Saving…';
+  pendingActions++;
   try { await run(); } catch(error) {status.textContent=error.message;status.classList.add('field-error');toast(error.message,true);}
-  finally {buttons.forEach((button,index)=>button.disabled=prior[index]);document.dispatchEvent(new CustomEvent('cipher:photos-changed'));}
+  finally {pendingActions--;buttons.forEach((button,index)=>button.disabled=prior[index]);document.dispatchEvent(new CustomEvent('cipher:photos-changed'));}
 }
 for(const form of document.querySelectorAll('.decision-form'))form.addEventListener('submit',event=>{
   event.preventDefault();action(form,async()=>{
@@ -149,12 +150,19 @@ for(const button of document.querySelectorAll('[data-retry-mail]'))button.addEve
   if(button.dataset.failed==='true'&&!await confirmAction('Check the sender mailbox first. If the previous attempt arrived, retrying could send a duplicate. Retry this email?'))return;
   action(button.closest('article'),async()=>{const result=await request('/api/admin/outbox/'+button.dataset.retryMail+'/retry','POST',{});saved(result.message || 'Email status: '+result.status,result.status==='failed'?'error':'success');});
 });
-// Poll counts only: never interrupt an editor's unsaved reply or content changes.
-const applicationNotice=document.querySelector('#application-notice');
-applicationNotice?.querySelector('a').addEventListener('click',event=>{
-  event.preventDefault();location.assign('/admin?inbox='+Date.now()+'#join-requests');
+document.querySelector('[data-delete-all-mail]')?.addEventListener('click',async event=>{
+  if(!await confirmAction('Delete every outgoing email record? Queued delivery will be cancelled. Messages already accepted by the mail server cannot be recalled.'))return;
+  action(event.currentTarget.closest('.outbox-toolbar'),async()=>{
+    const result=await request('/api/admin/outbox','DELETE',{});
+    saved(result.message);
+  });
 });
-let notificationTimer;
+// Refresh an open inbox only when the editor has no unsaved work or active action.
+const applicationNotice=document.querySelector('#application-notice');
+applicationNotice?.querySelectorAll('[data-inbox-refresh]').forEach(link=>link.addEventListener('click',event=>{
+  event.preventDefault();event.stopPropagation();location.assign('/admin?inbox='+Date.now()+'#'+link.dataset.inboxRefresh);
+}));
+let notificationTimer,inboxUpdated=false;
 async function refreshNotifications(){
   // Background admin tabs also keep their shared session alive.
   try{
@@ -163,6 +171,10 @@ async function refreshNotifications(){
     if(String(data.newCount)!==applicationNotice.dataset.count||data.latest!==applicationNotice.dataset.latest){
       applicationNotice.querySelector('span').textContent=`Inbox updated: ${data.newCount} new application(s) or enquiries.`;
       applicationNotice.dataset.count=String(data.newCount);applicationNotice.dataset.latest=data.latest || '';
+      inboxUpdated=true;
+    }
+    if(inboxUpdated&&!document.hidden&&!hasUnsavedChanges()&&!pendingActions&&!document.querySelector('dialog[open]')&&!document.activeElement?.closest('input,textarea,select,[contenteditable]')&&['#join-requests','#contact-messages'].includes(location.hash)){
+      pageLeaving=true;location.reload();
     }
   }catch{/* Keep the saved inbox visible while offline. */}
 }

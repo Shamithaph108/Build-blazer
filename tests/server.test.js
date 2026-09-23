@@ -299,6 +299,12 @@ test('every email status can be removed, cancelled mail stays cancelled even dur
   const sending=service.send(id);await began;await send('/api/admin/outbox/'+id,{},'DELETE');release();await sending;
   assert.equal((await fixture.db.collection('outbox').findOne({id})).status,'cancelled');
   assert.doesNotMatch((await get('/admin')).text,/data-mail-id="inflight-/);
+  for(const suffix of ['one','two'])await app.locals.mail.queue({id:`bulk-delete-${suffix}-${randomUUID()}`,submissionId:'fixture',kind:'reply',recipient:'member@example.com',subject:'Bulk delete fixture',body:'Test email.'});
+  assert.equal((await send('/api/admin/outbox',{},'DELETE',{'X-CSRF-Token':'wrong'})).status,403);
+  const deleted=await send('/api/admin/outbox',{},'DELETE');assert.equal(deleted.status,200);
+  assert.match((await deleted.json()).message,/Deleted \d+ outgoing email/);
+  assert.equal(await fixture.db.collection('outbox').countDocuments({deleted_at:{$exists:false}}),0);
+  assert.equal((await send('/api/admin/outbox',{},'DELETE')).status,200);
 });
 
 test('selected contacts persist independently of enquiries and mail, survive restarts and join every bulk audience until explicitly deleted',async()=>{
@@ -400,9 +406,9 @@ test('event times, statuses, ordered photos and profile fields survive edits; pr
 });
 
 test('password changes require the current password, revoke every session and never expose hashes',async()=>{
-  const newPassword=randomBytes(24).toString('hex');
+  const newPassword=randomBytes(4).toString('hex'); // Exactly eight characters.
   assert.equal((await send('/api/admin/password',{currentPassword:'wrong',newPassword,confirmPassword:newPassword})).status,403);
-  assert.equal((await send('/api/admin/password',{currentPassword:password,newPassword:'short',confirmPassword:'short'})).status,422);
+  assert.equal((await send('/api/admin/password',{currentPassword:password,newPassword:'1234567',confirmPassword:'1234567'})).status,422);
   assert.equal((await send('/api/admin/password',{currentPassword:password,newPassword,confirmPassword:newPassword})).status,200);
   assert.equal(await fixture.db.collection('sessions').countDocuments({username:'test-editor'}),0);
   assert.equal((await get('/api/admin/overview')).response.status,401);

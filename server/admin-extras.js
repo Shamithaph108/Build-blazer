@@ -7,6 +7,15 @@ export function adminExtras(app,{db,mail,requireAdmin,library}){
     await db.collection('sessions').updateOne({token_hash:req.session.token_hash},{$set:{closing:true,expires:Date.now()+30000}});
     res.status(204).end();
   });
+  app.delete('/api/admin/outbox',requireAdmin,async(_req,res)=>{
+    const result=await db.collection('outbox').updateMany(
+      {deleted_at:{$exists:false}},
+      {$set:{status:'cancelled',deleted_at:new Date().toISOString()},$unset:{recipient:'',subject:'',body:'',error:''}}
+    );
+    res.json({ok:true,message:result.modifiedCount
+      ?`Deleted ${result.modifiedCount} outgoing email${result.modifiedCount===1?'':'s'}. Queued delivery was cancelled.`
+      :'There are no outgoing emails to delete.'});
+  });
   app.delete('/api/admin/outbox/:id',requireAdmin,async(req,res)=>{
     const row=await db.collection('outbox').findOne({id:req.params.id});
     if(!row)return res.status(404).json({error:'Email not found.'});

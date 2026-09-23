@@ -2782,3 +2782,23 @@ input[type=checkbox]{accent-color:#95ffb5}
   .footer-grid{gap:20px}
   .footer-grid>div:last-child{font-size:10px}
 }
+
+/* Compact admin navigation and a comfortably centered public footer. */
+.sidebar-caption{margin:32px 12px 10px}
+.admin-sidebar nav{gap:3px}
+.admin-sidebar nav a,.admin-sidebar nav button{gap:11px;padding:9px 12px}
+.admin-sidebar nav :is(a,button)>span{font-size:17px}
+.admin-sidebar nav form{margin-top:12px;padding-top:10px}
+.sidebar-footer{padding-top:18px}
+.reference-site .premium-footer.wrap{width:min(1140px,calc(100% - 64px));margin-inline:auto}
+.reference-site .footer-grid>div,.reference-site .footer-bottom>*{min-width:0;overflow-wrap:anywhere}
+.reference-site .site-footer .text-link{max-width:100%;overflow-wrap:anywhere}
+.notification-strip{gap:12px;flex-wrap:wrap}
+
+@media(max-width:600px){
+  .reference-site .footer-grid{grid-template-columns:minmax(0,1fr);text-align:center;gap:30px}
+  .reference-site .footer-grid>div:first-child{grid-column:auto}
+  .reference-site .footer-grid p{margin-inline:auto}
+  .reference-site .footer-socials{justify-content:center}
+  .reference-site .footer-bottom{justify-content:center;text-align:center;gap:14px}
+}
