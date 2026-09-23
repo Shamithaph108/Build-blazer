@@ -11,6 +11,85 @@ import { createMailService } from '../server/mail.js';
 import sharp from 'sharp';
 import { createTestDatabase } from './mongo-fixture.js';
 import { migrateDomains } from '../server/domain-migration.js';
+
+test('SMTP diagnostics distinguish missing production settings and authentication without exposing secrets', async () => {
+  const missing = await createMailService(null, {env:{VERCEL:'1'}}).verify();
+  assert.equal(missing.code, 'NOT_CONFIGURED');
+  assert.deepEqual(missing.missing, ['SMTP_HOST','SMTP_USER','SMTP_PASS','MAIL_FROM']);
+  assert.match(missing.message, /Vercel Project Settings/);
+  assert.match(missing.message, /Google App Password, never your normal Google password/);
+  const invalid = await createMailService(null, {env:{SMTP_HOST:'smtp.example.com',SMTP_USER:'test',SMTP_PASS:'test-only-secret',MAIL_FROM:'invalid',SMTP_PORT:'25'}}).verify();
+  assert.equal(invalid.code,'INVALID_CONFIG');
+  assert.deepEqual(invalid.invalid,['MAIL_FROM','SMTP_PORT']);
+  const auth = await createMailService(null, {
+    env:{VERCEL:'1',MAIL_FROM:'sender@example.com',SMTP_PASS:'test-only-secret'},
+    transport:{verify:async()=>{throw Object.assign(new Error('Raw provider response test-only-secret'),{code:'EAUTH'});}}
+  }).verify();
+  assert.equal(auth.code,'EAUTH');
+  assert.match(auth.message,/Google App Password/);
+  assert.doesNotMatch(JSON.stringify([missing,invalid,auth]),/test-only-secret|Raw provider response/);
+});
+
+test('Vercel proxy headers preserve login/API limits and private inbox access; missing SMTP leaves queued mail intact', async t => {
+  const isolated = await createTestDatabase();
+  t.after(()=>isolated.close());
+  const beforeVercel=process.env.VERCEL;
+  let proxied;
+  try {
+    process.env.VERCEL='1';
+    proxied=await createApp({db:isolated.db,baseUrl:'http://localhost:3456',mail:{env:{VERCEL:'1'}},limits:{login:2,submissions:2}});
+  } finally {
+    if(beforeVercel===undefined)delete process.env.VERCEL;else process.env.VERCEL=beforeVercel;
+  }
+  assert.equal(proxied.get('trust proxy'),1);
+  const warnings=[];
+  t.mock.method(console,'error',(...args)=>warnings.push(args.map(arg=>String(arg)).join(' ')));
+  const listener=proxied.listen(0,'127.0.0.1');await once(listener,'listening');
+  t.after(()=>new Promise(resolve=>listener.close(resolve)));
+  const url=`http://127.0.0.1:${listener.address().port}`;
+  let session='',token='';
+  const request=async(route,{method='GET',body,ip='198.51.100.10',forwarded='for=203.0.113.99;proto=https',csrfToken}={})=>{
+    const json=route.startsWith('/api');
+    const response=await fetch(url+route,{method,redirect:'manual',headers:{
+      Cookie:session,Origin:'http://localhost:3456','X-Forwarded-For':ip,Forwarded:forwarded,
+      ...(method!=='GET'?{'Content-Type':json?'application/json':'application/x-www-form-urlencoded','X-CSRF-Token':csrfToken??token}:{})
+    },...(method!=='GET'?{body:json?JSON.stringify(body||{}):new URLSearchParams({_csrf:token,...body})}:{})});
+    const setCookie=response.headers.get('set-cookie');if(setCookie)session=setCookie.split(';')[0];
+    const text=await response.text();token=text.match(/name="csrf-token" content="([a-f0-9]+)"/)?.[1]||text.match(/name="_csrf" value="([a-f0-9]+)"/)?.[1]||token;
+    return {status:response.status,text,headers:response.headers};
+  };
+  assert.equal((await request('/admin/login')).status,200);
+  assert.equal((await request('/')).status,200);
+  assert.equal((await request('/api/admin/notifications')).status,401);
+  assert.equal((await request('/api/admin/submissions')).status,401);
+  for(let i=0;i<3;i++){
+    // Neither a forged Forwarded value nor a forged leftmost XFF entry gets a new quota.
+    const result=await request('/admin/login',{method:'POST',body:{username:'unknown',password:'wrong'},ip:`203.0.113.${i+1}, 198.51.100.10`,forwarded:`for=203.0.113.${i+10}`});
+    assert.equal(result.status,i<2?401:429);
+  }
+  await isolated.db.collection('admins').insertOne({username:'proxy-editor',password_hash:await hashPassword('proxy-test-password-only')});
+  assert.equal((await request('/admin/login',{method:'POST',body:{username:'proxy-editor',password:'proxy-test-password-only'},ip:'198.51.100.11'})).status,303);
+  assert.equal((await request('/admin')).status,200);
+  assert.equal((await request('/api/admin/notifications')).status,200);
+  for(let i=0;i<3;i++)assert.equal((await request('/api/submissions',{method:'POST',ip:`2001:db8:1234:ab00::${i+1}`})).status,i<2?422:429);
+  assert.equal((await request('/api/submissions',{method:'POST',ip:'2001:db8:5678::1'})).status,422);
+  const submissionId=randomUUID(),mailId='reply-'+randomUUID();
+  await isolated.db.collection('submissions').insertOne({id:submissionId,name:'Proxy Test',email:'test@example.com',purpose:'join',message:'Private test application',status:'new',decision:'pending',version:1,created_at:new Date().toISOString()});
+  const inbox=await request('/api/admin/submissions');assert.equal(inbox.status,200);
+  assert.equal(JSON.parse(inbox.text).submissions[0].id,submissionId);
+  assert.equal(JSON.parse(inbox.text).submissions[0]._id,undefined);
+  assert.match(inbox.headers.get('cache-control'),/no-store/);
+  await proxied.locals.mail.queue({id:mailId,submissionId,kind:'reply',recipient:'test@example.com',subject:'Test reply',body:'Test message'});
+  const verify=await request('/api/admin/mail/verify',{method:'POST'});assert.equal(verify.status,503);
+  assert.equal(JSON.parse(verify.text).code,'NOT_CONFIGURED');
+  const queuedBefore=await isolated.db.collection('outbox').findOne({id:mailId});
+  const retry=await request(`/api/admin/outbox/${mailId}/retry`,{method:'POST'});assert.equal(retry.status,503);
+  assert.deepEqual(JSON.parse(retry.text).missing,['SMTP_HOST','SMTP_USER','SMTP_PASS','MAIL_FROM']);
+  assert.match(JSON.parse(retry.text).error,/Vercel Project Settings/);
+  assert.deepEqual(await isolated.db.collection('outbox').findOne({id:mailId}),queuedBefore);
+  assert.equal((await request(`/api/admin/outbox/${mailId}/retry`,{method:'POST',csrfToken:'invalid'})).status,403);
+  assert.equal(warnings.filter(text=>/ERR_ERL_|ValidationError/.test(text)).length,0,warnings.join('\n'));
+});
 let fixture;
 
 let app,server,base,cookie='',csrf='';

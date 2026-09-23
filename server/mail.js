@@ -8,6 +8,15 @@ export function createMailService(db, { env = process.env, transport } = {}) {
   const from = env.MAIL_FROM || '';
   const notify = env.ADMIN_NOTIFY_EMAIL || '';
   const port = Number(env.SMTP_PORT || 587);
+  const setup = env.VERCEL === '1'
+    ? 'Vercel Project Settings → Environment Variables (Production), then redeploy'
+    : 'the private .env file, then restart the server';
+  const required = transport ? ['MAIL_FROM'] : ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM'];
+  const missing = required.filter(name => !env[name]);
+  const invalid = [
+    ...(from && !address(from) ? ['MAIL_FROM'] : []),
+    ...(!transport && ![465, 587].includes(port) ? ['SMTP_PORT'] : [])
+  ];
 
   const configured = Boolean(
     address(from) &&
@@ -42,9 +51,10 @@ export function createMailService(db, { env = process.env, transport } = {}) {
     if (!configured || !sender) {
       return {
         ok: false,
-        code: 'NOT_CONFIGURED',
-        message:
-          'Email is not configured. Add SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS and MAIL_FROM to the private .env file, then restart the server.'
+        code: missing.length ? 'NOT_CONFIGURED' : 'INVALID_CONFIG',
+        missing,
+        invalid,
+        message: `Email is not configured. ${missing.length ? `Missing: ${missing.join(', ')}. ` : ''}${invalid.length ? `Invalid: ${invalid.join(', ')}. ` : ''}Set SMTP_HOST, SMTP_PORT (587 or 465), SMTP_USER, SMTP_PASS and MAIL_FROM in ${setup}. For Gmail, SMTP_PASS must be a Google App Password, never your normal Google password.`
       };
     }
 
@@ -72,7 +82,7 @@ export function createMailService(db, { env = process.env, transport } = {}) {
           ok: false,
           code,
           message:
-            'The mail provider rejected the login. For Gmail, use a Google App Password as SMTP_PASS, then restart the server.'
+            `The mail provider rejected authentication. For Gmail, SMTP_PASS must be a Google App Password, never your normal Google password. Update the SMTP settings in ${setup}.`
         };
       }
       if (['EDNS', 'ENOTFOUND', 'EAI_AGAIN'].includes(code)) {

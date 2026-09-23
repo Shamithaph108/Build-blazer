@@ -289,7 +289,9 @@ export async function createApp(options = {}) {
 
   app.disable('x-powered-by');
 
-  if (process.env.TRUST_PROXY === '1') {
+  // Vercel supplies/overwrites X-Forwarded-For with the client IP. Trust only
+  // that last proxy hop; keep express-rate-limit's default IP/IPv6 validation.
+  if (process.env.VERCEL === '1' || process.env.TRUST_PROXY === '1') {
     app.set('trust proxy', 1);
   }
 

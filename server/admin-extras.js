@@ -28,7 +28,7 @@ export function adminExtras(app,{db,mail,requireAdmin,library}){
   const mailCheckLimit=rateLimit({windowMs:15*60*1000,limit:12,standardHeaders:'draft-8',legacyHeaders:false,message:{error:'Too many mailbox checks. Try again later.'}});
   app.post('/api/admin/mail/verify',requireAdmin,mailCheckLimit,async(_req,res)=>{
     const result=await mail.verify();
-    if(!result.ok)return res.status(503).json({error:result.message,code:result.code});
+    if(!result.ok)return res.status(503).json({error:result.message,code:result.code,missing:result.missing,invalid:result.invalid});
     res.json(result);
   });
   const limit=rateLimit({windowMs:60*60*1000,limit:30,standardHeaders:'draft-8',legacyHeaders:false,message:{error:'Bulk email limit reached. Try again later.'}});

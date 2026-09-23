@@ -2,6 +2,15 @@ import { rateLimit } from 'express-rate-limit';
 import { saveSelectedMember } from './member-directory.js';
 
 export function membershipRoutes(app, { db, mail, requireAdmin }) {
+  app.get('/api/admin/submissions', requireAdmin, async (_req, res) => {
+    const submissions = await db.collection('submissions')
+      .find({}, { projection: { _id: 0 } })
+      .sort({ created_at: -1, id: -1 })
+      .limit(500)
+      .toArray();
+    res.json({ submissions });
+  });
+
   app.get('/api/admin/notifications', requireAdmin, async (_req, res) => {
     const [newCount, latest, queued] = await Promise.all([
       db.collection('submissions').countDocuments({ status: 'new' }),
@@ -189,9 +198,12 @@ export function membershipRoutes(app, { db, mail, requireAdmin }) {
       }
 
       if (!mail.configured) {
+        const result = await mail.verify();
         return res.status(503).json({
-          error:
-            'Configure SMTP in the private .env file and restart the server first.'
+          error: result.message,
+          code: result.code,
+          missing: result.missing,
+          invalid: result.invalid
         });
       }
 
