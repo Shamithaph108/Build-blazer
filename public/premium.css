@@ -1469,8 +1469,11 @@ input[type=checkbox]{accent-color:#95ffb5}
   padding:30px 18px;
   display:flex;
   flex-direction:column;
+
+  /* Make the whole sidebar scroll */
   overflow-y:auto;
   overflow-x:hidden;
+  scroll-behavior:smooth;
 }
 
 .admin-brand{
