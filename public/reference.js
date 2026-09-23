@@ -9,7 +9,7 @@
   const detail=document.querySelector('#detail-dialog');
   const detailContent=document.querySelector('#dialog-content');
   const pointer={x:-1000,y:-1000,ringX:-1000,ringY:-1000,active:false,hover:false};
-  let lastTime=0,animationFrame=0,viewWidth=innerWidth,viewHeight=innerHeight;
+  let lastTime=0,lastFieldDraw=0,lastWordDraw=0,animationFrame=0,viewWidth=innerWidth,viewHeight=innerHeight;
   const timers=new Set();
   const later=(fn,delay)=>{const id=setTimeout(()=>{timers.delete(id);fn();},delay);timers.add(id);return id;};
 
@@ -119,15 +119,30 @@
 
 
   // Animated lines fill the viewport, bend around the pointer, and move with scrolling.
-  const field=document.querySelector('#contour-field'),fieldContext=field.getContext('2d');
-  const word=document.querySelector('#matrix-wordmark'),wordContext=word.getContext('2d');
+  const field=document.querySelector('#contour-field');
+  let fieldWorker=null,fieldContext=null;
+  if('transferControlToOffscreen' in field&&'Worker' in window){
+    try{fieldWorker=new Worker('/contour-worker.js');}catch{fieldWorker=null;}
+  }
+  if(!fieldWorker)fieldContext=field.getContext('2d');
+  const word=document.querySelector('#matrix-wordmark');
+  let wordWorker=null,wordContext=null,wordTransferred=false;
+  if('transferControlToOffscreen' in word&&'Worker' in window){
+    try{wordWorker=new Worker('/wordmark-worker.js');}catch{wordWorker=null;}
+  }
+  if(!wordWorker)wordContext=word.getContext('2d');
   const wordMask=document.createElement('canvas'),maskContext=wordMask.getContext('2d',{willReadFrequently:true});
   let particles=[],wordWidth=0,wordHeight=0,wordVisible=true,wordPointer={x:-1000,y:-1000},fieldDpr=1;
   const colors=['#9dffb8','#dbffe5','#65f791','#8fffb0','#bcffd2'];
   const compactMotion=matchMedia('(max-width: 800px), (pointer: coarse)');
-  function resizeField(){viewWidth=innerWidth;viewHeight=innerHeight;fieldDpr=compactMotion.matches?1:Math.min(devicePixelRatio||1,1.5);field.width=Math.round(viewWidth*fieldDpr);field.height=Math.round(viewHeight*fieldDpr);fieldContext.setTransform(fieldDpr,0,0,fieldDpr,0,0);drawField(0);document.body.classList.add('field-ready');}
+  let fieldTransferred=false;
+  function resizeField(){viewWidth=innerWidth;viewHeight=innerHeight;fieldDpr=compactMotion.matches?1:Math.min(devicePixelRatio||1,1.5);
+    if(fieldWorker){const message={type:fieldTransferred?'resize':'init',width:viewWidth,height:viewHeight,ratio:fieldDpr,compact:compactMotion.matches};if(!fieldTransferred){message.canvas=field.transferControlToOffscreen();fieldWorker.postMessage(message,[message.canvas]);fieldTransferred=true;}else fieldWorker.postMessage(message);}
+    else{field.width=Math.round(viewWidth*fieldDpr);field.height=Math.round(viewHeight*fieldDpr);fieldContext.setTransform(fieldDpr,0,0,fieldDpr,0,0);drawField(0);}
+    document.body.classList.add('field-ready');}
   function drawField(time){
-    const ctx=fieldContext;ctx.clearRect(0,0,viewWidth,viewHeight);const scale=viewWidth/1920,spacing=Math.max(compactMotion.matches?14:8,viewWidth/(compactMotion.matches?85:140)),rowStep=compactMotion.matches?32:22,scroll=scrollY*.19;
+    if(fieldWorker){fieldWorker.postMessage({type:'draw',time,scroll:scrollY,pointerX:pointer.x,pointerY:pointer.y,pointerActive:pointer.active&&!motion.matches});return;}
+    const ctx=fieldContext;ctx.clearRect(0,0,viewWidth,viewHeight);const scale=viewWidth/1920,spacing=Math.max(compactMotion.matches?14:10,viewWidth/(compactMotion.matches?85:110)),rowStep=compactMotion.matches?32:26,scroll=scrollY*.19;
     for(let line=-12;line<viewWidth/spacing+12;line++){
       const base=line*spacing;ctx.beginPath();
       for(let y=-40;y<=viewHeight+40;y+=rowStep){
@@ -141,20 +156,27 @@
       ctx.strokeStyle=line%5===0?'rgba(40,183,100,.38)':'rgba(50,143,109,.43)';ctx.lineWidth=line%9===0?.9:.65;ctx.stroke();
     }
   }
+  let wordPrepareFrame=0,preparedWordWidth=0,preparedWordHeight=0;
   function prepareWord(){
     const rect=word.getBoundingClientRect();wordWidth=Math.round(rect.width);wordHeight=Math.round(rect.height);if(!wordWidth||!wordHeight)return;
-    const dpr=Math.min(devicePixelRatio||1,2);word.width=wordWidth*dpr;word.height=wordHeight*dpr;wordContext.setTransform(dpr,0,0,dpr,0,0);wordMask.width=wordWidth;wordMask.height=wordHeight;
-    const size=Math.min(wordWidth*.185,wordHeight*1.1);maskContext.font=`600 ${size}px "Cipher Sans",sans-serif`;maskContext.textAlign='center';maskContext.textBaseline='middle';maskContext.translate(wordWidth/2,0);maskContext.scale(1.18,1);maskContext.fillText('CIPHER',0,wordHeight*.58);
+    if(wordWidth===preparedWordWidth&&wordHeight===preparedWordHeight&&particles.length){drawWord(0);return;}
+    preparedWordWidth=wordWidth;preparedWordHeight=wordHeight;
+    const dpr=Math.min(devicePixelRatio||1,2);if(!wordWorker){word.width=wordWidth*dpr;word.height=wordHeight*dpr;wordContext.setTransform(dpr,0,0,dpr,0,0);}wordMask.width=wordWidth;wordMask.height=wordHeight;
+    const size=Math.min(wordWidth*.185,wordHeight*1.1);maskContext.setTransform(1,0,0,1,0,0);maskContext.clearRect(0,0,wordWidth,wordHeight);maskContext.font=`600 ${size}px "Cipher Sans",sans-serif`;maskContext.textAlign='center';maskContext.textBaseline='middle';maskContext.translate(wordWidth/2,0);maskContext.scale(1.18,1);maskContext.fillText('CIPHER',0,wordHeight*.58);
     const data=maskContext.getImageData(0,0,wordWidth,wordHeight).data,step=Math.max(4,wordWidth/169);particles=[];
     for(let y=0;y<wordHeight;y+=step)for(let x=0;x<wordWidth;x+=step){if(data[(Math.floor(y)*wordWidth+Math.floor(x))*4+3]>90)particles.push({homeX:x,homeY:y,x,y,vx:0,vy:0,seed:Math.floor(x*3+y*7)%37});}
+    if(wordWorker){const message={type:'prepare',width:wordWidth,height:wordHeight,ratio:dpr,step,particles,colors};if(!wordTransferred){message.canvas=word.transferControlToOffscreen();wordWorker.postMessage(message,[message.canvas]);wordTransferred=true;}else wordWorker.postMessage(message);}
     if(!motion.matches)word.parentElement.classList.add('canvas-ready');else word.parentElement.classList.remove('canvas-ready');drawWord(0);
   }
+  function scheduleWordPreparation(){cancelAnimationFrame(wordPrepareFrame);wordPrepareFrame=requestAnimationFrame(prepareWord);}
   function drawWord(time){
-    if(!wordWidth||!wordVisible||motion.matches)return;const ctx=wordContext,step=Math.max(4,wordWidth/169);ctx.clearRect(0,0,wordWidth,wordHeight);ctx.font=`${step*.94}px "Cipher Mono",monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
+    if(!wordWidth||!wordVisible||motion.matches)return;
+    if(wordWorker){wordWorker.postMessage({type:'draw',time,pointerX:wordPointer.x,pointerY:wordPointer.y,pointerActive:pointer.active});return;}
+    const ctx=wordContext,step=Math.max(4,wordWidth/169);ctx.clearRect(0,0,wordWidth,wordHeight);ctx.font=`${step*.94}px "Cipher Mono",monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
     for(const p of particles){const dx=p.x-wordPointer.x,dy=p.y-wordPointer.y,distance=Math.hypot(dx,dy),radius=Math.max(55,wordWidth*.1);if(pointer.active&&distance<radius&&distance>0){const force=(1-distance/radius)*2.4;p.vx+=dx/distance*force;p.vy+=dy/distance*force;}p.vx+=(p.homeX-p.x)*.035;p.vy+=(p.homeY-p.y)*.035;p.vx*=.84;p.vy*=.84;p.x+=p.vx;p.y+=p.vy;ctx.fillStyle=colors[p.seed%colors.length];const glyph='CIPHER01#@%+*';ctx.fillText(glyph[(p.seed+Math.floor(time/900+p.seed/3))%glyph.length],p.x,p.y);}
   }
   new IntersectionObserver(entries=>{wordVisible=entries[0].isIntersecting;},{rootMargin:'60px'}).observe(word);
-  new ResizeObserver(prepareWord).observe(word.parentElement);document.fonts.ready.then(prepareWord);resizeField();prepareWord();
+  new ResizeObserver(scheduleWordPreparation).observe(word.parentElement);document.fonts.ready.then(scheduleWordPreparation);resizeField();prepareWord();
   addEventListener('resize',resizeField);
 
   // A seamless, slow-moving leadership strip; pause on hover/focus and drag to inspect.
@@ -198,8 +220,11 @@
   detail.addEventListener('close',()=>document.body.append(cursor));
 
   function animate(time){
-    animationFrame=requestAnimationFrame(animate);const frameInterval=compactMotion.matches?100:40;if(document.hidden||time-lastTime<frameInterval)return;const delta=Math.min(110,time-lastTime);lastTime=time;
-    if(!motion.matches){drawField(time);drawWord(time);if(trackVisible&&trackLength&&!trackPaused&&!manualTrackPause&&!detail.open&&!intro.open){trackOffset=(trackOffset+delta*.036)%trackLength;track.style.transform=`translateX(${-trackOffset}px)`;}
+    animationFrame=requestAnimationFrame(animate);if(document.hidden)return;const delta=Math.min(50,lastTime?time-lastTime:16);lastTime=time;
+    if(!motion.matches){
+      if(time-lastFieldDraw>(compactMotion.matches?110:80)){lastFieldDraw=time;drawField(time);}
+      if(time-lastWordDraw>(compactMotion.matches?85:50)){lastWordDraw=time;drawWord(time);}
+      if(trackVisible&&trackLength&&!trackPaused&&!manualTrackPause&&!detail.open&&!intro.open){trackOffset=(trackOffset+delta*.036)%trackLength;track.style.transform=`translateX(${-trackOffset}px)`;}
       if(collageVisible&&!collageCarousel){
         collagePointer.x+=(collagePointer.targetX-collagePointer.x)*.12;
         collagePointer.y+=(collagePointer.targetY-collagePointer.y)*.12;
@@ -232,8 +257,8 @@
   animationFrame=requestAnimationFrame(animate);
 
   let code='';document.addEventListener('keydown',event=>{if(event.ctrlKey||event.altKey||event.metaKey||event.key.length!==1||event.target.closest('input,textarea,select,[contenteditable]'))return;code=(code+event.key.toLowerCase()).slice(-6);if(code==='cipher'&&!detail.open&&!intro.open){information('ROOT ACCESS','› You found the backdoor. Welcome to the inner circle of CIPHER. The real code was inside you all along.');code='';}});
-  compactMotion.addEventListener('change',()=>{lastTime=0;resizeField();prepareWord();});
-  addEventListener('pagehide',()=>{cancelAnimationFrame(animationFrame);cancelAnimationFrame(introFrame);timers.forEach(clearTimeout);});
+  compactMotion.addEventListener('change',()=>{lastTime=0;lastFieldDraw=0;lastWordDraw=0;preparedWordWidth=0;resizeField();scheduleWordPreparation();});
+  addEventListener('pagehide',()=>{cancelAnimationFrame(animationFrame);cancelAnimationFrame(introFrame);fieldWorker?.terminate();wordWorker?.terminate();timers.forEach(clearTimeout);});
   addEventListener('pageshow',event=>{if(event.persisted){lastTime=0;animationFrame=requestAnimationFrame(animate);if(intro.open)finishIntro();}});
 
   // Scroll-driven horizontal carousel interaction
