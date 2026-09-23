@@ -1,83 +1,62 @@
-# CIPHER — Create. Connect. Collaborate.
+# Cipher Build Blazer — Phase 2
 
-Official student-association website for CIPHER, Department of Computer Science and Engineering, St. Joseph Engineering College.
+Live build phase for **Cipher (CSE Association)'s** track of the Build Blazer event at SJEC.
 
-Live site: **https://cipher-buildblazer-chi.vercel.app**
+This repo is the starting point for Phase 2, where third-year teams fork it and build the winning design into a live, deployed website.
 
-The project is a maintainable Node.js and Express application with server-rendered EJS pages, MongoDB persistence, a protected content studio, real contact and membership workflows, SMTP delivery, responsive layouts, and the supplied CIPHER black-and-green visual identity.
+## How this works
 
-## Website
+1. **Fork** this repository into your own GitHub account.
+2. Clone your fork locally.
+3. Implement the winning Figma design assigned to your team.
+4. Commit early and often — the process matters as much as the result.
+5. Deploy your build (Vercel, Netlify, GitHub Pages, or similar).
+6. Submit your fork link + live deployment link before the deadline.
 
-- Home, About, Events, Team, and Join/Contact pages
-- Interactive event galleries and Matrix leadership portraits
-- Responsive keyboard-accessible dialogs and navigation
-- MongoDB-backed events, activities, team profiles and settings
-- Private join requests and contact messages
-- Individual and bulk email outbox with delivery history
-- Authenticated admin studio at `/admin`
+## Getting started
 
-## Stack
-
-- Node.js 22 and Express 5
-- EJS server-rendered templates
-- MongoDB
-- Nodemailer SMTP transport
-- Sharp image processing
-- Plain CSS and JavaScript, bundled with esbuild
-- Vercel Functions for production hosting
-
-## Local development
-
-```powershell
-npm install
-Copy-Item .env.example .env
-# Configure the private .env values.
-npm run admin:setup
-npm run dev
+```bash
+git clone https://github.com/<your-username>/cipher-buildblazer-p2.git
+cd cipher-buildblazer-p2
+# install dependencies here once the stack is decided
 ```
-
-Open `http://localhost:3000`. The admin login is available directly at `http://localhost:3000/admin` and is intentionally absent from the public navigation.
-
-## Validation
-
-```powershell
-npm test
-npm run build
-npm start
-```
-
-## Deployment
-
-The application is prepared for Vercel's Express runtime. Production requires:
-
-- `MONGODB_URI` from MongoDB Atlas or Vercel's MongoDB Atlas integration
-- `MONGO_DB_NAME=cipher`
-- `ADMIN_USERNAME` and a 16-character-or-longer `ADMIN_PASSWORD` for first-run admin creation
-- `BASE_URL` set to the final HTTPS origin
-- SMTP settings when real email delivery is required
-
-Admin-uploaded images are optimized and stored in MongoDB, so they remain available across Vercel Function restarts. Secrets, local credentials, uploads and development databases are excluded from Git.
-
-The current production deployment uses Vercel Functions and a connected MongoDB Atlas free-tier database. Existing CIPHER content, the editor account, submissions, mail history and uploaded media have been migrated to that database.
-
-Existing local records can be copied into a new production database without deleting records already there:
-
-```powershell
-$env:TARGET_MONGODB_URI='your-production-connection'
-$env:MIGRATION_CONFIRM='COPY_CIPHER_DATA'
-npm run data:migrate
-```
-
-Detailed operating, email and deployment instructions are in [RUNBOOK.md](RUNBOOK.md).
 
 ## Team
 
-Team-member details are awaiting confirmation and should be added here rather than invented.
+| Role | Name |
+|------|------|
+| Team Lead | Shamitha P H |
+| Member1 | Vaishali K V |
+| Member2 | Varsha K  |
 
-## License
+## Design reference
 
-See [LICENSE](LICENSE).
+* **Design Source:** Cipher :https://drive.google.com/file/d/1a9WW5a8rrhsv_C1jgfWs8K5ipaLAdxD8/view?usp=drivesdk
+* *Note: Direct Figma file access was not provided for this task. The frontend has been built to replicate the layout, spacing, and animations shown in the reference video as closely as possible.*
+
+
+## Tech stack
+
+Frontend: HTML, CSS, vanilla JavaScript
+Server: Node.js with Express 5
+Templates: EJS
+Database: MongoDB
+Styling/build: custom CSS bundled and minified with esbuild
+Fonts: Poppins and JetBrains Mono (@fontsource)
+Image processing/uploads: Sharp
+Email: Nodemailer
+Security: Helmet and Express Rate Limit
+Testing: Node’s built-in test runner, Playwright, and axe-core accessibility testing
+
+## Deployment
+
+Live link: _add once deployed_
+
+## Rules
+
+- Fork, don't clone-and-push directly to this repo.
+- Stick to the assigned Figma design as closely as possible.
+- Submit via pull request or the link-submission form (whichever the organizers specify).
 
 ---
-
-Built for the BuildBlazer challenge by the CIPHER student team at SJEC.
+Organized by **Cipher (CSE Association)**, SJEC, in collaboration with **AgentBlazer Club**.
