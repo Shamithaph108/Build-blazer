@@ -56,6 +56,14 @@ The application is prepared for Vercel's Express runtime. Production requires:
 
 Admin-uploaded images are optimized and stored in MongoDB, so they remain available across Vercel Function restarts. Secrets, local credentials, uploads and development databases are excluded from Git.
 
+Existing local records can be copied into a new production database without deleting records already there:
+
+```powershell
+$env:TARGET_MONGODB_URI='your-production-connection'
+$env:MIGRATION_CONFIRM='COPY_CIPHER_DATA'
+npm run data:migrate
+```
+
 Detailed operating, email and deployment instructions are in [RUNBOOK.md](RUNBOOK.md).
 
 ## Team

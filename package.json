@@ -11,6 +11,7 @@
     "build": "node scripts/build.js",
     "start": "node --env-file-if-exists=.env server/index.js --production",
     "admin:setup": "node --env-file-if-exists=.env scripts/setup-admin.js",
+    "data:migrate": "node --env-file-if-exists=.env scripts/copy-mongodb.js",
     "test": "node --test --test-concurrency=1 tests/server.test.js",
     "test:browser": "playwright test"
   },
