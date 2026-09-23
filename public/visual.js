@@ -125,7 +125,8 @@
     const state={canvas,context,width:0,height:0,columns:[],seed:hash(label)};
     canvas._cipherMatrix=state;states.add(state);visible.set(canvas,true);observer?.observe(canvas);
     const resize=()=>{
-      const box=canvas.getBoundingClientRect();if(!box.width||!box.height)return;
+      const box={width:canvas.clientWidth,height:canvas.clientHeight};if(!box.width||!box.height)return;
+      if(state.width===box.width&&state.height===box.height)return;
       const ratio=Math.min(devicePixelRatio||1,1.25);state.width=box.width;state.height=box.height;
       canvas.width=Math.round(box.width*ratio);canvas.height=Math.round(box.height*ratio);
       context.setTransform(ratio,0,0,ratio,0,0);
