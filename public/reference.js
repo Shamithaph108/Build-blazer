@@ -124,12 +124,13 @@
   const wordMask=document.createElement('canvas'),maskContext=wordMask.getContext('2d',{willReadFrequently:true});
   let particles=[],wordWidth=0,wordHeight=0,wordVisible=true,wordPointer={x:-1000,y:-1000},fieldDpr=1;
   const colors=['#9dffb8','#dbffe5','#65f791','#8fffb0','#bcffd2'];
-  function resizeField(){viewWidth=innerWidth;viewHeight=innerHeight;fieldDpr=Math.min(devicePixelRatio||1,1.5);field.width=Math.round(viewWidth*fieldDpr);field.height=Math.round(viewHeight*fieldDpr);fieldContext.setTransform(fieldDpr,0,0,fieldDpr,0,0);drawField(0);document.body.classList.add('field-ready');}
+  const compactMotion=matchMedia('(max-width: 800px), (pointer: coarse)');
+  function resizeField(){viewWidth=innerWidth;viewHeight=innerHeight;fieldDpr=compactMotion.matches?1:Math.min(devicePixelRatio||1,1.5);field.width=Math.round(viewWidth*fieldDpr);field.height=Math.round(viewHeight*fieldDpr);fieldContext.setTransform(fieldDpr,0,0,fieldDpr,0,0);drawField(0);document.body.classList.add('field-ready');}
   function drawField(time){
-    const ctx=fieldContext;ctx.clearRect(0,0,viewWidth,viewHeight);const scale=viewWidth/1920,spacing=Math.max(8,viewWidth/140),scroll=scrollY*.19;
+    const ctx=fieldContext;ctx.clearRect(0,0,viewWidth,viewHeight);const scale=viewWidth/1920,spacing=Math.max(compactMotion.matches?14:8,viewWidth/(compactMotion.matches?85:140)),rowStep=compactMotion.matches?32:22,scroll=scrollY*.19;
     for(let line=-12;line<viewWidth/spacing+12;line++){
       const base=line*spacing;ctx.beginPath();
-      for(let y=-40;y<=viewHeight+40;y+=22){
+      for(let y=-40;y<=viewHeight+40;y+=rowStep){
         const phase=(y+scroll)/(Math.max(viewWidth,800)*.17)+time*.000075;
         const broad=Math.sin(phase+base/viewWidth*5)*Math.sin(base/viewWidth*7+1.2)*120*scale;
         const tight=(Math.sin(phase*2.8+base/viewWidth*9)*24+Math.asin(Math.sin(phase*2.1+base/viewWidth*6))*21)*scale;
@@ -197,7 +198,7 @@
   detail.addEventListener('close',()=>document.body.append(cursor));
 
   function animate(time){
-    animationFrame=requestAnimationFrame(animate);if(document.hidden||time-lastTime<32)return;const delta=Math.min(60,time-lastTime);lastTime=time;
+    animationFrame=requestAnimationFrame(animate);const frameInterval=compactMotion.matches?100:40;if(document.hidden||time-lastTime<frameInterval)return;const delta=Math.min(110,time-lastTime);lastTime=time;
     if(!motion.matches){drawField(time);drawWord(time);if(trackVisible&&trackLength&&!trackPaused&&!manualTrackPause&&!detail.open&&!intro.open){trackOffset=(trackOffset+delta*.036)%trackLength;track.style.transform=`translateX(${-trackOffset}px)`;}
       if(collageVisible&&!collageCarousel){
         collagePointer.x+=(collagePointer.targetX-collagePointer.x)*.12;
@@ -231,6 +232,7 @@
   animationFrame=requestAnimationFrame(animate);
 
   let code='';document.addEventListener('keydown',event=>{if(event.ctrlKey||event.altKey||event.metaKey||event.key.length!==1||event.target.closest('input,textarea,select,[contenteditable]'))return;code=(code+event.key.toLowerCase()).slice(-6);if(code==='cipher'&&!detail.open&&!intro.open){information('ROOT ACCESS','› You found the backdoor. Welcome to the inner circle of CIPHER. The real code was inside you all along.');code='';}});
+  compactMotion.addEventListener('change',()=>{lastTime=0;resizeField();prepareWord();});
   addEventListener('pagehide',()=>{cancelAnimationFrame(animationFrame);cancelAnimationFrame(introFrame);timers.forEach(clearTimeout);});
   addEventListener('pageshow',event=>{if(event.persisted){lastTime=0;animationFrame=requestAnimationFrame(animate);if(intro.open)finishIntro();}});
 
