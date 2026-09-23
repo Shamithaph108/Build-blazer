@@ -1,0 +1,8 @@
+<section class="editor-section" id="mail-outbox"><p class="eyebrow">DELIVERY HISTORY</p><h2>Outgoing emails.</h2><p class="muted">Queued messages are sent automatically after valid SMTP authentication. Accepted means the mail server accepted the email; it does not confirm inbox delivery. Showing the latest 500.</p>
+<% if(!outbox.length) { %><p>No emails queued yet.</p><% } %>
+<% for(const message of outbox) { %><article class="inbox-item" data-mail-id="<%= message.id %>"><div class="card-top"><span class="badge"><%= message.kind %> / <%= message.status %></span><time datetime="<%= message.created_at %>"><%= message.created_at.slice(0,10) %></time></div>
+<h3><%= message.subject %></h3><p>To: <%= message.recipient || 'Configured admin mailbox' %></p><details><summary>Read message</summary><p class="preserve-lines"><%= message.body %></p></details>
+<% if(message.error) { %><p class="field-error"><%= message.error %></p><% } %>
+<% if(message.status==='sending') { %><p class="muted">Sending. If this remains after a restart, check the sender mailbox before composing another message.</p><% } %>
+<% if(['failed','queued'].includes(message.status)) { %><button class="button button-outline" data-retry-mail="<%= message.id %>" data-failed="<%= message.status==='failed' %>" type="button">Send / retry email</button><% } %><button class="button button-danger" data-delete-mail="<%= message.id %>" type="button">Delete email</button><p class="editor-status" role="status"></p>
+</article><% } %></section>

@@ -1,0 +1,47 @@
+{
+  "events": [
+    {
+      "id": "prompt-ops-2026",
+      "title": "PROMPT OPS–2K26",
+      "category": "Competition",
+      "date": "2026-03-25",
+      "location": "Department of CSE, SJEC",
+      "summary": "A technical competition on prompt engineering and AI tools by the AgentBlazer Club and Cipher. Track 1 (1st Year) covered invitation, logo and image recreation; Track 2 (2nd Year) tested JSON conversion, Python debugging and Gemini AI security prompt challenge.",
+      "description": "Organised by AgentBlazer Club and CIPHER under the guidance of Ms. Nisha J Roche, Ms. Jaishma K, and HOD Dr. Melwyn D’Souza. First-year students competed in invitation generation, logo recreation, and image recreation. Second-year students worked on JSON conversion, Python debugging, and a Gemini AI security prompt extraction challenge.\n\nFirst-year top honours: Chinmayee, Chris Royston Monteiro, and Deeksha Ravi Moger. Second-year top honours: Harimurali KS, Venus Suhani D’Lima, and Venisha Snehal D’Souza.",
+      "image": "/images/promptops-09.webp",
+      "gallery": ["/images/promptops-09.webp", "/images/promptops-02.webp", "/images/promptops-12.webp", "/images/promptops-10.webp", "/images/promptops-11.webp", "/images/promptops-07.webp", "/images/promptops-08.webp", "/images/promptops-01.webp"],
+      "source": "Cipher_report .docx; supplied PromptOps 2026 photographs",
+      "published": true
+    },
+    {
+      "id": "lumiere-2025",
+      "title": "Lumière — The Gala",
+      "category": "Community",
+      "date": "2025-10-29",
+      "location": "Kalam Auditorium, SJEC",
+      "summary": "The CSE branch entry programme at Kalam Auditorium, themed ‘Where Glam Meets Glow’. Organised by the Cipher Association with coordinated red, gold and black décor, it welcomed students into the department and reinforced a shared sense of collective identity.",
+      "description": "The Department of Computer Science and Engineering held its branch entry programme, Lumière — The Gala, on 29 October 2025 at the Kalam Auditorium. Organised by the CIPHER Association, the gathering celebrated the theme ‘Where Glam Meets Glow’.\n\nRed, gold, and black décor, floral arrangements, illuminated panels, and a central Lumière backdrop set the scene. Students connected with peers beyond academics, marking their transition into the department and a shared sense of belonging.",
+      "image": "/images/lumiere.webp",
+      "gallery": ["/images/lumiere.webp", "/images/lumiere-gallery-02.webp", "/images/lumiere-gallery-03.webp"],
+      "source": "Cipher_report .docx; three visible gallery previews from the supplied video at 29, 32.3, and 34 seconds. Original photo pack not supplied locally.",
+      "published": true
+    }
+  ],
+  "team": [
+    {"id":"elston-pereira","name":"Elston Herold Pereira","role":"President","bio":"President in the team-supplied CIPHER design reference. Current term confirmation is pending.","image":"/images/elston-pereira.webp","order":1,"published":true},
+    {"id":"raynell-lewis","name":"Raynell Lewis","role":"Vice President","bio":"Vice President in the team-supplied CIPHER design reference. Current term confirmation is pending.","image":"/images/raynell-lewis.webp","order":2,"published":true},
+    {"id":"nazmin-ziya","name":"Nazmin Ziya","role":"Treasurer","bio":"Treasurer in the team-supplied CIPHER design reference. Current term confirmation is pending.","image":"/images/nazmin-ziya.webp","order":3,"published":true},
+    {"id":"jeslin-ninora","name":"Jeslin Ninora","role":"Joint Treasurer","bio":"Joint Treasurer in the team-supplied CIPHER design reference. Current term confirmation is pending.","image":"/images/jeslin-ninora.webp","order":4,"published":true},
+    {"id":"chaitra-rm","name":"Chaitra RM","role":"Secretary","bio":"Secretary in the supplied CIPHER design reference. Name and original portrait supplied in Cipher_Photos; current term confirmation is pending.","image":"/images/chaitra-rm.webp","order":5,"published":true},
+    {"id":"himansh-ullal","name":"Himansh Ullal","role":"Role awaiting confirmation","bio":"Named portrait supplied in Cipher_Photos. Confirm the role and biography before publishing.","image":"/images/himansh-ullal.webp","order":6,"published":false},
+    {"id":"parthipan-j","name":"Parthipan J","role":"Role awaiting confirmation","bio":"Named portrait supplied in Cipher_Photos. Confirm the role and biography before publishing.","image":"/images/parthipan-j.webp","order":7,"published":false},
+    {"id":"ruben-saldana","name":"Ruben Saldana","role":"Role awaiting confirmation","bio":"Named portrait supplied in Cipher_Photos. Confirm the role and biography before publishing.","image":"/images/ruben-saldana.webp","order":8,"published":false},
+    {"id":"shamitha-kv","name":"Shamitha KV","role":"Role awaiting confirmation","bio":"Named portrait supplied in Cipher_Photos. Confirm the role and biography before publishing.","image":"/images/shamitha-kv.webp","order":9,"published":false}
+  ],
+  "domains": [
+    {"id":"domain-1","icon":"code","title":"Technical Skill Building","description":"Hands-on workshops, coding sessions, and tech talks that turn theory into working software.","order":0,"published":true},
+    {"id":"domain-2","icon":"crown","title":"Leadership & Governance","description":"Annual elections for President, Secretary, and office bearers — guided by the HOD and Faculty Coordinator.","order":1,"published":true},
+    {"id":"domain-3","icon":"people","title":"Events & Collaboration","description":"Hackathons, seminars, and department-level competitions that bring students together.","order":2,"published":true},
+    {"id":"domain-4","icon":"rocket","title":"Industry Readiness","description":"Bridging classroom learning with real-world application to prepare students for the field.","order":3,"published":true}
+  ]
+}

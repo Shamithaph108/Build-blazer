@@ -1,0 +1,12 @@
+<div class="domain-grid" data-carousel="Domains" data-carousel-kind="cards">
+  <% for(const [index, domain] of (reference.domains || []).entries()) { %>
+  <article class="domain-card slide-on-scroll" tabindex="0" role="button" data-domain-card data-title="<%= domain.title %>" data-description="<%= domain.description %>" data-icon="<%= domain.icon %>">
+    <div class="card-top">
+      <span class="domain-icon"><%- include('icon',{name:domain.icon}) %></span>
+      <span class="mono muted"><%= String(index + 1).padStart(2,'0') %> / <%= String((reference.domains || []).length).padStart(2,'0') %></span>
+    </div>
+    <h3><%= domain.title %></h3>
+    <p><%= domain.description %></p>
+  </article>
+  <% } %>
+</div>

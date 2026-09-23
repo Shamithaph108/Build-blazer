@@ -1,0 +1,9 @@
+<div class="event-grid" data-carousel="Event archive" data-carousel-kind="events">
+  <% for(const event of events) { %>
+  <article class="event-card" data-category="<%= event.category %>" data-search="<%= (event.title+' '+event.summary).toLowerCase() %>">
+    <div class="event-body"><div class="event-code-mark" aria-hidden="true"><span>CIPHER / <%= event.category.toUpperCase() %></span><span><%= String(events.indexOf(event)+1).padStart(2,'0') %></span></div><div class="card-top"><span class="eyebrow"><%= event.category %></span><time datetime="<%= event.date %>"><%= formatDate(event.date) %></time></div><h3><a href="/events/<%= event.id %>"><%= event.title %></a></h3><p><%= event.summary %></p><span class="status-chip"><%= eventState(event) %></span><div class="card-bottom"><span class="muted small"><%= event.location %></span><button type="button" class="text-button" data-event="<%= event.id %>" aria-label="View <%= event.title %> gallery">View Gallery ↗</button></div></div>
+    <template id="event-<%= event.id %>"><div class="dialog-grid"><div><p class="eyebrow">// CIPHER ACTIVITIES</p><h2 id="dialog-title"><%= event.title %></h2><p class="mono accent small"><%= formatDate(event.date) %><%= event.time?' · '+event.time+' IST':'' %> · <%= event.location %></p><div class="prose"><% for(const p of event.description.split('\n\n')) { %><p><%= p %></p><% } %></div><a class="text-link" href="/events/<%= event.id %>">Open event page ↗</a></div><%- include('gallery',{event}) %></div></template>
+  </article>
+  <% } %>
+</div>
+<% if(!events.length) { %><div class="empty-state"><p>New experiences are on their way.</p><p class="muted">Check back for event announcements.</p></div><% } %>

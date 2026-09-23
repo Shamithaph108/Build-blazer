@@ -1,0 +1,4 @@
+<%- include('partials/head') %>
+<% if(preview) { %><div class="notice wrap">PRIVATE PREVIEW · <%= event.published?'Published event':'Draft — visible only to signed-in admins' %></div><% } %><section class="page-heading wrap"><a class="text-link" href="/events">← All events</a><p class="eyebrow"><%= event.category %> / <%= formatDate(event.date) %><%= event.time?' · '+event.time+' IST':'' %> / <%= eventState(event) %></p><h1><%= event.title %></h1><p class="lead"><%= event.summary %></p></section>
+<section class="section wrap event-detail"><div><p class="eyebrow">// THE EXPERIENCE</p><h2><%= event.location %></h2><div class="prose"><% for(const p of event.description.split('\n\n')) { %><p><%= p %></p><% } %></div><p class="small muted">Source: <%= event.source %></p></div><%- include('partials/gallery') %></section>
+<% if(!preview) { %><%- include('partials/cta') %><% } %><%- include('partials/footer') %>

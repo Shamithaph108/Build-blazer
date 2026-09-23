@@ -1,0 +1,8 @@
+<section class="editor-section" id="bulk-email"><p class="eyebrow">GROUP MESSAGE</p><h2>Send to everyone.</h2>
+<p>Send one message to all saved members and enquiries, or selected members only. Saved members are included even after their original enquiry is deleted. Duplicate email addresses receive one copy.</p>
+<form id="bulk-email-form" class="form-panel"><input type="hidden" name="key" value="<%= replyKey() %>">
+<label>Recipients<select name="audience"><option value="all">All saved members and enquiries</option><option value="selected">Selected members only</option></select></label>
+<label>Subject<input name="subject" required maxlength="160"></label><label>Message<textarea name="message" required maxlength="8000" rows="6"></textarea></label>
+<button type="submit" class="button">Preview recipients</button><p class="editor-status" role="status"></p>
+<div id="bulk-preview" hidden><p id="bulk-summary"></p><details><summary>View recipient addresses</summary><ul id="bulk-addresses"></ul></details><p>Each person receives a separate email. Their address is not shared with other recipients.</p><button type="button" class="button" id="send-bulk">Confirm and send to all shown</button></div></form>
+</section>

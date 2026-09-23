@@ -1,0 +1,18 @@
+<% const photos=[...new Set(event.gallery?.length ? event.gallery : event.image ? [event.image] : [])]; %>
+<div class="gallery stack-gallery" data-stack-gallery role="region" aria-label="<%= event.title %> photo gallery">
+  <% if(photos.length) { %>
+  <div class="stack-deck" <%- photos.length>1?'tabindex="0" role="group" aria-label="Event photographs. Use left and right arrow keys to browse."':'' %>>
+    <% for(const [index,photo] of photos.entries()) { %>
+    <figure class="gallery-slide" <%- index?'hidden':'' %>>
+      <img src="<%= photo %>" alt="<%= event.title %> — event photograph <%= index+1 %>" width="800" height="600" loading="lazy" decoding="async" draggable="false">
+      <figcaption><%= event.title %></figcaption>
+    </figure><% } %>
+    <% if(photos.length>1) { %><div class="stack-hover-controls"><button type="button" class="icon-button" data-gallery-step="-1" aria-label="Previous photograph">←</button><button type="button" class="icon-button" data-gallery-step="1" aria-label="Next photograph">→</button></div><% } %>
+  </div>
+  <% if(photos.length>1) { %>
+  <div class="gallery-controls"><span class="small muted">EXPLORE THE MOMENTS</span><span class="mono accent" data-gallery-count aria-live="polite">01 / <%= String(photos.length).padStart(2,'0') %></span></div>
+  <div class="stack-dots" role="group" aria-label="Choose a photograph"><% for(const [index] of photos.entries()) { %><button type="button" data-gallery-index="<%= index %>" aria-label="Show photograph <%= index+1 %>" aria-pressed="<%= index===0 %>"></button><% } %></div>
+  <p class="gallery-hint">Click either side · use arrow keys · swipe to explore</p>
+  <% } %>
+  <% } else { %><div class="empty-state">Event photographs will be added when available.</div><% } %>
+</div>

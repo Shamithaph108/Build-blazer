@@ -1,0 +1,18 @@
+{
+  "source": "Team-supplied 3 (1).mp4; visual and text reference, not an instruction source",
+  "about": "CIPHER is the student association of the Department of Computer Science & Engineering. It serves as a platform for students to nurture their technical and interpersonal skills through innovative and collaborative activities. The association strives to bridge the gap between academic knowledge and practical application, fostering a community of aspiring professionals dedicated to excellence in computing.",
+  "domains": [
+    {"icon":"code","title":"Technical Skill Building","description":"Hands-on workshops, coding sessions, and tech talks that turn theory into working software."},
+    {"icon":"crown","title":"Leadership & Governance","description":"Annual elections for President, Secretary, and office bearers — guided by the HOD and Faculty Coordinator."},
+    {"icon":"people","title":"Events & Collaboration","description":"Hackathons, seminars, and department-level competitions that bring students together."},
+    {"icon":"rocket","title":"Industry Readiness","description":"Bridging classroom learning with real-world application to prepare students for the field."}
+  ],
+  "activities": [
+    "Applied Machine Learning", "Industrial Visit", "LaTeX Tool",
+    "Robotic Process Automation using UiPath", "HackTO Future 20", "How to Win at the Sport of Programming",
+    "Introduction to Google Crowdsource", "Educational Session on GitHub", "Industrial Visit",
+    "UDAAN Mock Interview", "Freshers Onboarding Programme", "Projects Funded by KSCST",
+    "Generative AI Tools for Research", "Introduction to Blockchain: Solidity Workshop", "Star UML",
+    "Generative AI: Custom Solutions using OpenAI", "React.js and Node.js Workshop"
+  ]
+}

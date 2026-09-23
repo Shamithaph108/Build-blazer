@@ -1,0 +1,11 @@
+<section class="editor-section" id="selected-members">
+  <p class="eyebrow">// SAVED CONTACTS</p><h2>Selected members.</h2>
+  <p>These members stay on your mailing list until you delete them here. Signing out, restarting the website, or deleting their original enquiry or outgoing emails does not remove them. They are included in both “Send to all” and “Selected members only”.</p>
+  <% if(!members.length) { %><div class="empty-state">No selected members saved yet. Select an applicant in the Community inbox and save your decision.</div><% } %>
+  <% for(const member of members) { %><article class="inbox-item" data-saved-member="<%= member.id %>">
+    <div class="card-top"><span class="badge">Selected · saved contact</span><time datetime="<%= member.selected_at %>"><%= member.selected_at?.slice(0,10) || '' %></time></div>
+    <h3><%= member.name %></h3><a class="text-link" href="mailto:<%= encodeURIComponent(member.email) %>"><%= member.email %></a>
+    <details><summary>Application details</summary><p class="preserve-lines"><%= member.message %></p></details>
+    <button class="button button-danger" type="button" data-delete-member="<%= member.id %>">Delete selected member</button><p class="editor-status" role="status"></p>
+  </article><% } %>
+</section>

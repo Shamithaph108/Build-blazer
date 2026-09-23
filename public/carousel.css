@@ -1,0 +1,113 @@
+/* Public content decks. Native scroll works with touch, keyboard and no JS. */
+.reference-site .reference-section{padding:80px max(24px,4vw);border-top:1px solid #76ff9920}
+.reference-site .reference-section>h2,.reference-site .reference-about h2{font-size:clamp(38px,5.1vw,78px);line-height:1.05;margin:20px 0 42px;letter-spacing:-.065em}
+.reference-site .reference-section>.eyebrow{font-size:11px;letter-spacing:.26em}
+.reference-site .reference-about{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:5vw;align-items:center}
+.reference-site .reference-about-copy{font-size:clamp(16px,1.35vw,20px);letter-spacing:0}
+.reference-site .reference-archive>p:not(.eyebrow){max-width:720px;margin-bottom:30px}
+.reference-site .reference-hero-copy{margin-inline:max(0px,2.25vw);max-width:1000px}
+.reference-site .reference-hero-copy h2{font-size:clamp(27px,3.2vw,48px);max-width:820px;line-height:1.15}
+.reference-site .reference-hero-copy>p{font-size:clamp(16px,1.25vw,20px);margin-top:24px;max-width:700px}
+.reference-site .reference-hero-copy .button-row{margin-top:30px}
+.reference-site .reference-hero .button{min-height:48px;padding:15px 24px;font-size:13px;border-radius:12px}
+.reference-site .reference-team-window{padding:0;overflow:visible;mask-image:none}
+.carousel-shell{--slide-width:calc((100% - 48px)/3);min-width:0;position:relative;margin-top:18px}
+.carousel-shell.carousel-events{--slide-width:calc((100% - 28px)/2)}
+.carousel-shell.carousel-photos{--slide-width:88%;margin-top:0}
+.carousel-shell.carousel-people{--slide-width:clamp(245px,27%,340px)}
+.carousel-shell .carousel-track{position:relative;display:flex;gap:24px;width:100%;max-width:100%;margin:0;padding:20px 8px 32px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:8px;overscroll-behavior-x:contain;touch-action:pan-x pan-y;cursor:grab;transform:none;will-change:auto}
+.carousel-track::after{content:'';flex:0 0 max(0px,calc(100% - var(--slide-width) - 24px));pointer-events:none}
+.carousel-shell .carousel-slot{position:relative;flex:0 0 var(--slide-width);width:var(--slide-width);min-width:0;scroll-snap-align:start;scroll-snap-stop:normal;perspective:1300px;display:flex}
+.carousel-shell .carousel-slot>.carousel-card{width:100%;min-width:0;max-width:none;margin:0;height:100%;flex:1;transform:rotateY(calc(var(--slide-distance,0)*-3deg)) scale(calc(1 - var(--slide-distance,0)*.025));transform-origin:left center;translate:none;transition:transform .55s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .3s;animation:none;border:1px solid #437b5680;border-radius:24px;background:linear-gradient(145deg,#132e1d,#07130c 80%)!important;box-shadow:inset 0 1px 0 #b9ffcb12,0 14px 35px #0004}
+.carousel-slot.is-active>.carousel-card{border-color:#9bffc08c;box-shadow:inset 0 1px 0 #c9ffda38,0 18px 42px #0005,0 0 30px #51ff8110}
+.carousel-track.is-dragging{scroll-snap-type:none;cursor:grabbing;user-select:none}
+.carousel-track.is-dragging *{cursor:grabbing!important;user-select:none}
+.carousel-controls{display:flex;align-items:center;gap:12px;padding:10px 8px 0;min-height:58px}
+.carousel-controls button,.member-navigation button,.bio-pagination button{display:grid;place-items:center;flex:none;min-width:46px;min-height:46px;border:1px solid #68ad7e;border-radius:50%;background:#0b2115;color:#b6ffca;font:22px/1 var(--sans);transition:background .2s,box-shadow .2s}
+.carousel-controls button:hover,.member-navigation button:hover,.bio-pagination button:hover{background:#96ffb6;color:#03150a;box-shadow:0 0 20px #66ff9228}
+.carousel-controls button:disabled{opacity:.45;cursor:default}
+.carousel-hint{font:10px/1.5 var(--mono);letter-spacing:.12em;color:#afd2ba;white-space:nowrap}
+.carousel-count{font:12px/1 var(--mono);color:#caffd8;min-width:70px;text-align:center}
+.carousel-progress{height:2px;flex:1;min-width:20px;background:#294c35;margin-inline:12px}
+.carousel-progress>span{display:block;width:100%;height:100%;background:#9effbd;box-shadow:0 0 9px #6cff95;transform-origin:left;transition:transform .3s}
+.carousel-shell .reference-domain,.carousel-shell .domain-card{padding:30px;min-height:350px;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start}
+.card-coordinate{position:absolute;right:24px;top:18px;font:600 68px/1 var(--sans);letter-spacing:-.09em;color:#6da78350;pointer-events:none}
+.carousel-shell .reference-domain-icon{width:54px;height:54px;border-radius:16px;margin:4px 0 34px}
+.carousel-shell .reference-domain-icon svg{width:25px;height:25px}
+.carousel-shell .domain-status{position:static;font:10px var(--mono);letter-spacing:.12em;color:#98cba8;margin-bottom:14px}
+.carousel-shell .reference-domain h3{max-width:none;font-size:clamp(23px,2.1vw,32px);margin-bottom:20px}
+.carousel-shell .reference-domain p{font-size:15px;line-height:1.85;color:#c5dccc}
+.carousel-shell .reference-event{padding:0 26px 26px;display:flex;flex-direction:column}
+.reference-event-cover{position:relative;margin:0 -26px 26px;overflow:hidden;border-radius:23px 23px 0 0;background:#0b1e12}
+.reference-event-cover img{width:100%;height:250px;object-fit:cover;transition:transform .65s}
+.reference-event-cover>span{position:absolute;bottom:16px;left:20px;padding:8px 12px;border:1px solid #9fffb864;border-radius:8px;background:#06130ae8;color:#caffd9;text-transform:uppercase;font:10px var(--mono);letter-spacing:.1em}
+.reference-event:hover .reference-event-cover img{transform:scale(1.04)}
+.carousel-shell .reference-event-meta{font-size:10px;gap:12px;margin-bottom:18px}
+.carousel-shell .reference-event-meta time{font-size:10px}
+.carousel-shell .reference-event h3{font-size:clamp(24px,2.3vw,36px);margin-bottom:20px}
+.carousel-shell .reference-event>p{font-size:15px;line-height:1.8;margin-bottom:20px}
+.carousel-shell .reference-event>.text-button{margin-top:auto;align-self:flex-start;border-bottom:1px solid #6fff8f66;font-size:11px}
+.carousel-shell .reference-person{overflow:hidden}
+.carousel-shell .reference-person .portrait,.carousel-shell .team-card .portrait{aspect-ratio:.85}
+.carousel-shell .reference-person .portrait img{filter:none}
+.carousel-shell .reference-person-caption{padding:18px 18px 6px;text-align:left}
+.carousel-shell .reference-person-caption h3{font-size:22px;margin:14px 0 10px}
+.person-open{font:10px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:#b3ffcd}
+.carousel-shell .reference-person .reference-socials{justify-content:flex-start;padding:12px 18px 20px;gap:15px}
+.carousel-shell .reference-activity{padding:26px;display:flex;flex-direction:column;align-items:flex-start;gap:20px;text-align:left;min-height:290px;position:relative;overflow:hidden}
+.carousel-shell .reference-activity .activity-number{font:500 72px/1 var(--sans);color:#82b694;letter-spacing:-.08em}
+.carousel-shell .reference-activity .activity-card-title{font:500 clamp(22px,2vw,30px)/1.3 var(--sans);color:#e1ffe9;flex:1}
+.carousel-shell .reference-activity .activity-open{font:10px var(--mono);color:#9dffb9;text-transform:uppercase;letter-spacing:.1em}
+.activity-card-image{width:100%;height:150px;object-fit:cover;border-radius:12px}
+.moment-card{margin:0;position:relative;overflow:hidden;background:#0b1e12}
+.moment-card img{width:100%;height:440px;object-fit:cover}
+.moment-card figcaption{position:absolute;inset:auto 0 0;padding:60px 24px 24px;background:linear-gradient(transparent,#020d07f2);color:#e8fff0}
+.moment-card figcaption span{display:block;font:10px var(--mono);letter-spacing:.14em;margin-bottom:10px;color:#acffbe}
+.moment-card figcaption strong{font:500 23px/1.4 var(--sans)}
+.reference-site .reference-about>.carousel-shell{min-width:0}
+
+/* Compact member cards: the stage fits the viewport; long bios paginate. */
+#detail-dialog[data-kind=profile],.reference-site #detail-dialog[data-kind=profile]{width:min(960px,calc(100vw - 32px));max-width:960px;max-height:none;height:fit-content;padding:57px 0 0;overflow:hidden}
+#detail-dialog[data-kind=profile] #dialog-content,.reference-site #detail-dialog[data-kind=profile] #dialog-content{max-height:none;overflow:hidden;padding:0}
+#detail-dialog[data-kind=profile] .profile-detail,.reference-site #detail-dialog[data-kind=profile] .profile-detail{display:block;animation:none}
+#detail-dialog[data-kind=profile] .member-stage{height:min(540px,calc(90dvh - 125px));display:grid;grid-template-columns:40% minmax(0,1fr);margin:0;animation:none}
+.member-portrait{position:relative;min-height:0;margin:0;background:#020a05;overflow:hidden;border-right:1px solid #70ae813d;isolation:isolate}
+.member-portrait img{position:relative;z-index:2;width:88%;height:100%;margin-inline:auto;object-fit:cover;object-position:center 35%;border:0;filter:none!important;-webkit-mask-image:radial-gradient(ellipse 94% 98% at 50% 42%,#000 64%,#000d 82%,transparent 100%);mask-image:radial-gradient(ellipse 94% 98% at 50% 42%,#000 64%,#000d 82%,transparent 100%)}
+.member-portrait::after{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(90deg,#020a0578,transparent 16%,transparent 84%,#020a0578),linear-gradient(0deg,#020a05b8,transparent 34%)}
+.member-portrait .initials{height:100%;display:grid;place-items:center;font:600 65px var(--sans);color:#aaffc0}
+.member-portrait-mark{position:absolute;left:20px;bottom:18px;color:#baffcc;font:600 44px/1 var(--sans);text-shadow:0 2px 12px #000;letter-spacing:-.09em}
+.member-copy{padding:32px;display:flex;flex-direction:column;min-height:0;min-width:0;gap:14px}
+#detail-dialog .member-copy>.eyebrow{font-size:11px;letter-spacing:.09em;margin:0;color:#9effb7}
+#detail-dialog .member-copy>h2{font-size:clamp(25px,3vw,42px);margin:0;line-height:1.13;flex:none;text-wrap:pretty}
+.member-bio{min-height:0;flex:1;overflow:hidden}
+#detail-dialog .member-bio p{font:400 15px/1.8 var(--sans);margin:0;color:#d2e6d8;overflow-wrap:anywhere;white-space:pre-wrap}
+.bio-pagination{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;height:36px}
+.bio-pagination button{min-width:36px;min-height:36px;font-size:17px}
+.bio-pagination [role=status]{font:10px var(--mono);color:#b3d6bf}
+.member-navigation{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;border-top:1px solid #80c29740;background:#06180e;height:68px}
+.member-navigation button{display:flex;gap:10px;font:11px var(--mono);border-radius:12px;padding:12px 16px;min-height:42px}
+.member-navigation [role=status]{font:12px var(--mono);color:#b9ffc9;white-space:nowrap}
+@media(max-width:1000px){.carousel-shell{--slide-width:44%}.carousel-shell.carousel-people{--slide-width:40%}.carousel-shell.carousel-events{--slide-width:75%}.reference-site .reference-about{grid-template-columns:1fr;gap:28px}.reference-site .reference-about>.carousel-shell{max-width:800px}.moment-card img{height:390px}}
+@media(max-width:600px){
+  .reference-site .reference-section{padding:56px 18px}.reference-site .reference-section>h2,.reference-site .reference-about h2{font-size:40px;margin-bottom:28px}
+  .carousel-shell,.carousel-shell.carousel-people,.carousel-shell.carousel-events{--slide-width:86%}
+  .carousel-shell.carousel-photos{--slide-width:91%}.carousel-shell .carousel-track{gap:16px;padding-inline:4px;scroll-padding-inline:4px;padding-bottom:20px}
+  .carousel-track::after{flex-basis:max(0px,calc(100% - var(--slide-width) - 16px))}
+  .carousel-controls{gap:8px;padding-inline:4px}.carousel-hint{display:none}.carousel-progress{margin-inline:0 8px}.carousel-count{font-size:11px;min-width:63px}
+  .carousel-shell .reference-domain,.carousel-shell .domain-card{padding:25px;min-height:330px}
+  .carousel-shell .reference-event{padding:0 22px 24px}.reference-event-cover{margin-inline:-22px}.reference-event-cover img{height:210px}
+  .carousel-shell .reference-person-caption h3{font-size:23px}.carousel-shell .reference-activity{min-height:290px}
+  .moment-card img{height:340px}.moment-card figcaption strong{font-size:20px}
+  #detail-dialog[data-kind=profile],.reference-site #detail-dialog[data-kind=profile]{width:calc(100vw - 24px)}
+  #detail-dialog[data-kind=profile] .member-stage{height:calc(92dvh - 125px);max-height:620px;grid-template-columns:1fr;grid-template-rows:minmax(120px,30%) minmax(0,1fr)}
+  .member-portrait{border-right:0;border-bottom:1px solid #70ae813d}.member-portrait img{object-fit:contain;background:radial-gradient(ellipse,#245436,#06160c)}
+  .member-portrait-mark{font-size:36px;bottom:12px}.member-copy{padding:20px 22px;gap:12px}
+  #detail-dialog .member-copy>h2{font-size:28px}#detail-dialog .member-copy>.eyebrow{font-size:10px}
+  #detail-dialog .member-bio p{font-size:14px;line-height:1.75}.member-navigation{padding-inline:14px}.member-navigation button{font-size:10px;padding:10px 12px}
+}
+@media(max-height:600px){
+  #detail-dialog[data-kind=profile] .member-stage{height:calc(96dvh - 113px);grid-template-columns:30% minmax(0,1fr);grid-template-rows:1fr;max-height:none}
+  .member-copy{padding:12px 20px;gap:8px}#detail-dialog .member-copy>h2{font-size:22px}#detail-dialog .member-copy>.eyebrow{font-size:9px}
+  #detail-dialog .member-bio p{font-size:13px;line-height:1.6}.member-navigation{height:56px;padding-block:7px}.bio-pagination{height:30px}.bio-pagination button{min-height:30px;min-width:32px}
+}
+@media(prefers-reduced-motion:reduce){.carousel-slot>.carousel-card{transform:none!important;transition:none!important}.carousel-progress>span{transition:none}}

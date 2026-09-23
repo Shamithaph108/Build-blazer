@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %><%= title.startsWith('CIPHER') ? '' : ' | CIPHER · SJEC' %></title>
+  <meta name="description" content="<%= description %>">
+  <meta name="theme-color" content="#050a07">
+  <meta name="color-scheme" content="dark">
+  <% if(noindex) { %><meta name="robots" content="noindex,nofollow"><% } %>
+  <link rel="canonical" href="<%= baseUrl + currentPath %>">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CIPHER · SJEC">
+  <meta property="og:title" content="<%= title %>">
+  <meta property="og:description" content="<%= description %>">
+  <meta property="og:url" content="<%= baseUrl + currentPath %>">
+  <meta property="og:image" content="<%= baseUrl %>/images/social-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/images/cipher-logo.webp" type="image/webp">
+  <link rel="stylesheet" href="/assets/styles.css?v=<%= assetVersion %>">
+  <script src="/assets/site.js?v=<%= assetVersion %>" defer></script>
+  <% if(currentPath==='/') { %>
+  <link rel="stylesheet" href="/assets/reference.css?v=<%= assetVersion %>">
+  <script src="/assets/reference.js?v=<%= assetVersion %>" defer></script>
+  <% } %>
+  <link rel="stylesheet" href="/assets/visual.css?v=<%= assetVersion %>">
+  <script src="/assets/visual.js?v=<%= assetVersion %>" defer></script>
+  <link rel="stylesheet" href="/assets/premium.css?v=<%= assetVersion %>">
+  <script src="/assets/stack-gallery.js?v=<%= assetVersion %>" defer></script>
+  <script src="/assets/premium.js?v=<%= assetVersion %>" defer></script>
+</head>
+<body id="top" class="<%= currentPath==='/'?'reference-site':currentPath.startsWith('/admin')?'admin-site':'' %>">
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="contours" aria-hidden="true"></div>
+<canvas id="ambient-matrix" aria-hidden="true"></canvas>
+<% if(!currentPath.startsWith('/admin')) { %><header class="site-header">
+  <div class="nav-shell">
+    <a class="brand" href="/" aria-label="CIPHER home"><img src="/images/cipher-logo.webp" width="104" height="67" alt=""><span>CIPHER<span class="brand-sub">CSE ASSOCIATION · SJEC</span></span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span>Menu</span><span aria-hidden="true">☰</span></button>
+    <nav id="primary-nav" aria-label="Main navigation">
+      <% for(const [href,label] of (currentPath==='/' ? [['#home','Home'],['#about','About'],['#leadership','Leadership'],['#events','Events'],['#join-contact','Join / Contact']] : [['/','Home'],['/about','About'],['/events','Events'],['/team','Team'],['/join','Join / Contact']])) { %>
+      <a href="<%= href %>" <%- currentPath===href || (href==='/events' && currentPath.startsWith('/events/')) ? 'aria-current="page"' : '' %>><%= label %></a>
+      <% } %>
+      <% if(currentPath.startsWith('/admin') && admin) { %><a href="/admin" aria-current="page">Dashboard</a><% } %>
+    </nav>
+    <a href="<%= currentPath==='/'?'#join-contact':'/join' %>" class="button button-outline nav-cta">Join / Contact<% if(currentPath!=='/') { %><span aria-hidden="true">↗</span><% } %></a>
+  </div>
+</header><% } else if(admin&&currentPath==='/admin') { %><%- include('admin-nav') %><% } else { %><header class="admin-auth-header"><a href="<%= admin?'/admin':'/' %>" class="admin-brand"><img src="/images/cipher-logo.webp" width="70" height="48" alt="CIPHER"><span><%= admin?'Back to dashboard':'CIPHER · Private editor' %></span></a></header><% } %>
+<main id="main">

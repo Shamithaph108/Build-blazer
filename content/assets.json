@@ -1,0 +1,226 @@
+[
+  {
+    "path": "/images/cipher-logo.webp",
+    "label": "Cipher Logo",
+    "source": "3.mp4, 25 seconds: header logo",
+    "width": 207,
+    "height": 133,
+    "smallWidth": 207
+  },
+  {
+    "path": "/images/promptops-01.webp",
+    "label": "Promptops 01",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\20260325_141046.jpg",
+    "width": 1200,
+    "height": 900,
+    "smallWidth": 600
+  },
+  {
+    "path": "/images/promptops-02.webp",
+    "label": "Promptops 02",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\20260325_165226.jpg",
+    "width": 900,
+    "height": 1200,
+    "smallWidth": 450
+  },
+  {
+    "path": "/images/promptops-03.webp",
+    "label": "Promptops 03",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\20260325_165255.jpg",
+    "width": 900,
+    "height": 1200,
+    "smallWidth": 450
+  },
+  {
+    "path": "/images/promptops-04.webp",
+    "label": "Promptops 04",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\20260325_165327(0).jpg",
+    "width": 900,
+    "height": 1200,
+    "smallWidth": 450
+  },
+  {
+    "path": "/images/promptops-05.webp",
+    "label": "Promptops 05",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\20260325_165354.jpg",
+    "width": 900,
+    "height": 1200,
+    "smallWidth": 450
+  },
+  {
+    "path": "/images/promptops-06.webp",
+    "label": "Promptops 06",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\20260325_165426.jpg",
+    "width": 900,
+    "height": 1200,
+    "smallWidth": 450
+  },
+  {
+    "path": "/images/promptops-07.webp",
+    "label": "Promptops 07",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\20260325_165526.jpg",
+    "width": 1200,
+    "height": 900,
+    "smallWidth": 600
+  },
+  {
+    "path": "/images/promptops-08.webp",
+    "label": "Promptops 08",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\20260325_165737.jpg",
+    "width": 1200,
+    "height": 900,
+    "smallWidth": 600
+  },
+  {
+    "path": "/images/promptops-09.webp",
+    "label": "Promptops 09",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\IMG_8476.JPG",
+    "width": 1200,
+    "height": 798,
+    "smallWidth": 600
+  },
+  {
+    "path": "/images/promptops-10.webp",
+    "label": "Promptops 10",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\IMG_8492.JPG",
+    "width": 1200,
+    "height": 798,
+    "smallWidth": 600
+  },
+  {
+    "path": "/images/promptops-11.webp",
+    "label": "Promptops 11",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\IMG_8500.JPG",
+    "width": 1200,
+    "height": 798,
+    "smallWidth": 600
+  },
+  {
+    "path": "/images/promptops-12.webp",
+    "label": "Promptops 12",
+    "source": "PromptOps 2026-20260915T115542Z-1-001\\PromptOps 2026\\IMG_8523.JPG",
+    "width": 1200,
+    "height": 798,
+    "smallWidth": 600
+  },
+  {
+    "path": "/images/cybersecurity-01.webp",
+    "label": "Cybersecurity 01",
+    "source": "Cybersecurity & Career Pathways-20260915T115546Z-1-001\\Cybersecurity & Career Pathways\\IMG-20260326-WA0008.jpg",
+    "width": 960,
+    "height": 1200,
+    "smallWidth": 480
+  },
+  {
+    "path": "/images/cybersecurity-02.webp",
+    "label": "Cybersecurity 02",
+    "source": "Cybersecurity & Career Pathways-20260915T115546Z-1-001\\Cybersecurity & Career Pathways\\IMG_8888.JPG",
+    "width": 1200,
+    "height": 798,
+    "smallWidth": 600
+  },
+  {
+    "path": "/images/cybersecurity-03.webp",
+    "label": "Cybersecurity 03",
+    "source": "Cybersecurity & Career Pathways-20260915T115546Z-1-001\\Cybersecurity & Career Pathways\\IMG_8908.JPG",
+    "width": 1200,
+    "height": 798,
+    "smallWidth": 600
+  },
+  {
+    "path": "/images/lumiere.webp",
+    "label": "Lumiere",
+    "source": "3.mp4, 29 seconds: Lumi\u00e8re gallery preview",
+    "width": 426,
+    "height": 325,
+    "smallWidth": 426
+  },
+  {
+    "path": "/images/lumiere-gallery-02.webp",
+    "label": "Lumiere Gallery 02",
+    "source": "Team-supplied video, lumiere-32.3.jpg",
+    "width": 426,
+    "height": 292,
+    "smallWidth": 426
+  },
+  {
+    "path": "/images/lumiere-gallery-03.webp",
+    "label": "Lumiere Gallery 03",
+    "source": "Team-supplied video, lumiere-34.jpg",
+    "width": 426,
+    "height": 360,
+    "smallWidth": 426
+  },
+  {
+    "path": "/images/chaitra-rm.webp",
+    "label": "Chaitra RM",
+    "source": "Cipher_Photos/Chaitra RM.JPG",
+    "width": 551,
+    "height": 720,
+    "smallWidth": 459
+  },
+  {
+    "path": "/images/elston-pereira.webp",
+    "label": "Elston Pereira",
+    "source": "Cipher_Photos/Elston Pereira.PNG",
+    "width": 580,
+    "height": 745,
+    "smallWidth": 467
+  },
+  {
+    "path": "/images/himansh-ullal.webp",
+    "label": "Himansh Ullal",
+    "source": "Cipher_Photos/Himansh Ullal.JPG",
+    "width": 800,
+    "height": 1200,
+    "smallWidth": 400
+  },
+  {
+    "path": "/images/jeslin-ninora.webp",
+    "label": "Jeslin Ninora",
+    "source": "Cipher_Photos/Jeslin Ninora.HEIC",
+    "width": 1000,
+    "height": 1033,
+    "smallWidth": 480
+  },
+  {
+    "path": "/images/nazmin-ziya.webp",
+    "label": "Nazmin Ziya",
+    "source": "Cipher_Photos/Nazmin Ziya.JPG",
+    "width": 900,
+    "height": 1200,
+    "smallWidth": 450
+  },
+  {
+    "path": "/images/parthipan-j.webp",
+    "label": "Parthipan J",
+    "source": "Cipher_Photos/Parthipan J.JPG",
+    "width": 822,
+    "height": 1200,
+    "smallWidth": 411
+  },
+  {
+    "path": "/images/raynell-lewis.webp",
+    "label": "Raynell Lewis",
+    "source": "Cipher_Photos/Raynell Lewis.JPG",
+    "width": 858,
+    "height": 1200,
+    "smallWidth": 429
+  },
+  {
+    "path": "/images/ruben-saldana.webp",
+    "label": "Ruben Saldana",
+    "source": "Cipher_Photos/Ruben Saldana.WEBP",
+    "width": 1000,
+    "height": 1000,
+    "smallWidth": 480
+  },
+  {
+    "path": "/images/shamitha-kv.webp",
+    "label": "Shamitha KV",
+    "source": "Cipher_Photos/Shamitha KV.JPG",
+    "width": 900,
+    "height": 1200,
+    "smallWidth": 450
+  }
+]

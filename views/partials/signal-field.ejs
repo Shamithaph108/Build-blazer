@@ -1,0 +1,24 @@
+<div class="signal-field" aria-hidden="true">
+  <div class="signal-horizon"></div>
+  <svg class="signal-ribbons" viewBox="0 0 1200 760" fill="none" focusable="false">
+    <defs>
+      <linearGradient id="signal-green" x1="150" y1="650" x2="1100" y2="80" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#41ff81" stop-opacity="0"/>
+        <stop offset=".35" stop-color="#42ff87" stop-opacity=".55"/>
+        <stop offset=".72" stop-color="#b8ffcc"/>
+        <stop offset="1" stop-color="#4dff86" stop-opacity=".12"/>
+      </linearGradient>
+      <path id="signal-curve" pathLength="100" d="M-120 700C180 420 425 815 785 500S780 140 1250-90"/>
+    </defs>
+    <g class="signal-contours" stroke="url(#signal-green)">
+      <use href="#signal-curve" stroke-width="2"/>
+      <use href="#signal-curve" transform="translate(0 22)"/>
+      <use href="#signal-curve" transform="translate(0 48)"/>
+      <use href="#signal-curve" transform="translate(0 80)" stroke-width="2"/>
+      <use href="#signal-curve" transform="translate(0 118)"/>
+      <use href="#signal-curve" transform="translate(0 164)"/>
+    </g>
+    <use class="signal-trace" href="#signal-curve" stroke="#c9ffdc" stroke-width="3"/>
+  </svg>
+  <span class="signal-spark signal-spark-one"></span><span class="signal-spark signal-spark-two"></span>
+</div>

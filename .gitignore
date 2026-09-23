@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+data/*.sqlite*
+data/*.db*
+data/admin-credentials.txt
+data/uploads/
+.tools/
+.inspection/
+test-results/
+playwright-report/
+.vercel/
+*.log
