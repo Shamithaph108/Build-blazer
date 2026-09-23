@@ -53,7 +53,7 @@
   },{passive:true});
   const hero=document.querySelector('.reference-hero');
   let heroVisible=true;
-  function sleepAmbient(){const asleep=document.hidden||!heroVisible;document.body.classList.toggle('ambient-asleep',asleep);if(asleep){cancelAnimationFrame(frame);frame=0;}else start();}
+  function sleepAmbient(){document.body.classList.toggle('ambient-asleep',document.hidden||!heroVisible);}
   if(hero)new IntersectionObserver(entries=>{heroVisible=entries[0].isIntersecting;sleepAmbient();}).observe(hero);
   document.addEventListener('visibilitychange',sleepAmbient);
   addEventListener('pagehide',()=>{cancelAnimationFrame(lightFrame);lightFrame=0;});
@@ -61,11 +61,10 @@
   const canvas=document.querySelector('#ambient-matrix'),ctx=canvas?.getContext('2d');
   let width=0,height=0,columns=[],frame=0,last=0;
   const glyphs='01CIPHER{}<>/+#';
-  const compactMotion=matchMedia('(max-width: 800px), (pointer: coarse)');
   function resize(){
     if(!ctx)return;width=innerWidth;height=innerHeight;
-    const ratio=compactMotion.matches?1:Math.min(devicePixelRatio||1,1.25);canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);
-    const spacing=compactMotion.matches?36:30;
+    const ratio=Math.min(devicePixelRatio||1,1.25);canvas.width=Math.round(width*ratio);canvas.height=Math.round(height*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);
+    const spacing=width<600?27:30;
     columns=Array.from({length:Math.ceil(width/spacing)},(_,i)=>({x:i*spacing+9,seed:(i*137)%997,speed:18+(i*17)%32,length:7+i%8}));
     draw(performance.now());
   }
@@ -82,15 +81,15 @@
       }
     }
   }
-  function loop(time){frame=0;if(document.hidden||stopped())return;if(time-last>(compactMotion.matches?100:50)){last=time;draw(time);}frame=requestAnimationFrame(loop);}
+  function loop(time){frame=0;if(document.hidden||stopped())return;if(time-last>45){last=time;draw(time);}frame=requestAnimationFrame(loop);}
   function start(){cancelAnimationFrame(frame);frame=0;if(ctx&&!document.hidden&&!stopped())frame=requestAnimationFrame(loop);}
-  resize();start();addEventListener('resize',resize,{passive:true});compactMotion.addEventListener('change',resize);
+  resize();start();addEventListener('resize',resize,{passive:true});
   document.addEventListener('visibilitychange',start);addEventListener('pagehide',()=>cancelAnimationFrame(frame));addEventListener('pageshow',start);
 })();
 
 (()=>{
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  const states=new Set(),visible=new WeakMap(),compactMotion=matchMedia('(max-width: 800px), (pointer: coarse)');
+  const states=new Set(),visible=new WeakMap();
   const glyphs='01CIPHER<>/{}+#';
   let frame=0,last=0;
 
@@ -127,10 +126,10 @@
     canvas._cipherMatrix=state;states.add(state);visible.set(canvas,true);observer?.observe(canvas);
     const resize=()=>{
       const box=canvas.getBoundingClientRect();if(!box.width||!box.height)return;
-      const ratio=compactMotion.matches?1:Math.min(devicePixelRatio||1,1.25);state.width=box.width;state.height=box.height;
+      const ratio=Math.min(devicePixelRatio||1,1.25);state.width=box.width;state.height=box.height;
       canvas.width=Math.round(box.width*ratio);canvas.height=Math.round(box.height*ratio);
       context.setTransform(ratio,0,0,ratio,0,0);
-      const spacing=compactMotion.matches?20:15;state.columns=Array.from({length:Math.ceil(box.width/spacing)},(_,index)=>({index,x:index*spacing+spacing/2,seed:(state.seed+index*97)%701,speed:15+index%9,length:8+index%7}));
+      const spacing=15;state.columns=Array.from({length:Math.ceil(box.width/spacing)},(_,index)=>({index,x:index*spacing+7,seed:(state.seed+index*97)%701,speed:15+index%9,length:8+index%7}));
       draw(state,performance.now());
     };
     state.resize=resize;
@@ -140,7 +139,7 @@
 
   function loop(time){
     frame=0;if(document.hidden||reduced.matches)return;
-    if(time-last>(compactMotion.matches?125:75)){last=time;for(const state of states)if(state.canvas.isConnected&&visible.get(state.canvas))draw(state,time);}
+    if(time-last>70){last=time;for(const state of states)if(state.canvas.isConnected&&visible.get(state.canvas))draw(state,time);}
     frame=requestAnimationFrame(loop);
   }
   function start(){
@@ -156,5 +155,4 @@
   const dialogContent=document.querySelector('#dialog-content');if(dialogContent)new MutationObserver(start).observe(dialogContent,{childList:true,subtree:true});
   document.addEventListener('visibilitychange',start);addEventListener('pageshow',start);addEventListener('pagehide',()=>cancelAnimationFrame(frame));
   if(reduced.addEventListener)reduced.addEventListener('change',start);else reduced.addListener(start);
-  compactMotion.addEventListener('change',()=>{for(const state of states)state.resize();start();});
 })();
