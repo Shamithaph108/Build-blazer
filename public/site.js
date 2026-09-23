@@ -248,13 +248,9 @@ function initScrollEntranceAnimations(){
   });
 }
 
-// The reference homepage has its own matching motion controller. Initialising
-// these observers there a second time causes duplicate layout work while scrolling.
-if(!document.body.classList.contains('reference-site')){
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>{initScrollCarousels();initScrollEntranceAnimations();});
-  }else{
-    initScrollCarousels();
-    initScrollEntranceAnimations();
-  }
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',()=>{initScrollCarousels();initScrollEntranceAnimations();});
+}else{
+  initScrollCarousels();
+  initScrollEntranceAnimations();
 }
