@@ -1,33 +1,274 @@
 <%- include('partials/head') %>
 <meta name="csrf-token" content="<%= csrf %>">
 <script src="/assets/admin.js?v=<%= assetVersion %>" type="module"></script>
+
 <section class="studio-shell studio">
-  <header class="studio-heading"><div><p class="eyebrow">CIPHER / CONTROL ROOM</p><h1>Your community.<br><span class="accent">In motion.</span></h1><p>Welcome back, <%= username %>. Create something worth sharing.</p></div><a href="/" target="_blank" rel="noopener" class="button button-outline">View website ↗</a></header>
+  <header class="studio-heading">
+    <div>
+      <p class="eyebrow">CIPHER / CONTROL ROOM</p>
+      <h1>Your community.<br><span class="accent">In motion.</span></h1>
+      <p>Welcome back, <%= username %>. Create something worth sharing.</p>
+    </div>
+    <a href="/" target="_blank" rel="noopener" class="button button-outline">View website ↗</a>
+  </header>
+
   <div class="notice success" id="studio-notice" hidden role="status"></div>
-  <div id="application-notice" class="notice notification-strip" role="status" data-count="<%= newCount %>" data-latest="<%= submissions[0]?.id || '' %>"><span id="inbox-count"><%= newCount %> unread applications or messages.</span> <a href="/admin#join-requests">Refresh inbox</a></div>
+
+  <div id="application-notice" class="notice notification-strip" role="status" data-count="<%= newCount %>" data-latest="<%= submissions[0]?.id || '' %>">
+    <span id="inbox-count"><%= newCount %> unread applications or messages.</span>
+    <a href="/admin#join-requests">Refresh inbox</a>
+  </div>
+
   <section id="overview" class="admin-panel editor-section" data-admin-panel>
-    <div class="section-heading"><div><p class="eyebrow">01 / LIVE OVERVIEW</p><h2>A pulse on CIPHER.</h2></div><span class="status-chip"><span class="status-dot"></span> CONNECTED</span></div>
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">01 / LIVE OVERVIEW</p>
+        <h2>A pulse on CIPHER.</h2>
+      </div>
+      <span class="status-chip"><span class="status-dot"></span> CONNECTED</span>
+    </div>
+
     <% const upcoming=events.filter(e=>eventState(e)==='upcoming').sort((a,b)=>a.date.localeCompare(b.date)); const stats=[['Total events',events.length],['Upcoming events',upcoming.length],['Published events',events.filter(e=>e.published).length],['Draft events',events.filter(e=>!e.published).length],['Team members',team.length],['Pending join requests',submissions.filter(s=>s.purpose==='join'&&s.decision==='pending').length],['Unread contact messages',submissions.filter(s=>s.purpose==='contact'&&s.status==='new').length],['Saved members',members.length]]; %>
-    <div class="dashboard-stats"><% for(const [label,value] of stats) { %><article class="metric-card"><p><%= label %></p><strong data-counter="<%= value %>"><%= value %></strong><span class="metric-rule" aria-hidden="true"></span></article><% } %></div>
-    <div class="overview-grid"><article class="overview-module"><p class="eyebrow">NEXT IN THE CALENDAR</p><h3>Coming into focus.</h3><% if(upcoming.length) { %><% for(const event of upcoming.slice(0,3)) { %><a href="/admin/events/<%= event.id %>/preview" class="upcoming-row"><time datetime="<%= event.date %>"><%= formatDate(event.date) %></time><strong><%= event.title %></strong><span class="badge"><%= event.published?'Published':'Draft' %></span></a><% } %><% } else { %><p class="empty-state">No upcoming events are scheduled. Create the next experience in Events.</p><% } %><a class="text-link" href="#edit-events">Manage events →</a></article>
-    <article class="overview-module"><p class="eyebrow">RECENT ADMIN ACTIVITY</p><h3>The latest changes.</h3><% if(!recentActivity.length) { %><p class="empty-state">New editor actions will appear here after they are saved.</p><% } %><ol class="audit-list"><% for(const action of recentActivity) { %><li><span class="status-dot"></span><div><strong><%= action.actor %></strong><p><%= action.action %> · <%= action.path.replace('/api/admin/','').split('/')[0] %></p><time datetime="<%= action.created_at %>"><%= action.created_at.slice(0,16).replace('T',' ') %> UTC</time></div></li><% } %></ol></article></div>
+
+    <div class="dashboard-stats">
+      <% for(const [label,value] of stats) { %>
+        <article class="metric-card">
+          <p><%= label %></p>
+          <strong data-counter="<%= value %>"><%= value %></strong>
+          <span class="metric-rule" aria-hidden="true"></span>
+        </article>
+      <% } %>
+    </div>
   </section>
+
   <section id="edit-events" class="admin-panel editor-section" data-admin-panel>
-    <div class="section-heading"><div><p class="eyebrow">02 / EXPERIENCES</p><h2>Events.</h2></div><a href="/events" target="_blank" rel="noopener" class="text-link">Preview public events ↗</a></div>
-    <details class="editor-item new-item"><summary>+ Add an event</summary><%- include('partials/editor-form',{kind:'events',item:{published:false},assets}) %></details>
-    <div data-record-list="events"><%- include('partials/admin-filters',{kind:'events'}) %><div data-record-items><% for(const item of events) { %><details class="editor-item record-item" data-record data-search="<%= (item.title+' '+item.location+' '+item.category).toLowerCase() %>" data-status="<%= item.published?'published':'draft' %>" data-category="<%= item.category %>" data-date="<%= item.date %>" data-name="<%= item.title %>">
-      <summary><span class="record-thumb"><% if(item.image) { %><img src="<%= item.image %>" width="100" height="80" alt="" loading="lazy"><% } else { %><span>C/</span><% } %></span><span class="record-summary"><strong><%= item.title %></strong><span><%= formatDate(item.date) %> · <%= item.location %></span><span><%= item.category %> · <%= (item.gallery||[]).length %> photos · <%= eventState(item) %></span></span><span class="badge"><%= item.published?'Published':'Draft' %></span></summary>
-      <div class="record-actions"><a class="text-link" href="/admin/events/<%= item.id %>/preview" target="_blank" rel="noopener">Preview event ↗</a><button type="button" class="button button-outline" data-publish-toggle><%= item.published?'Unpublish':'Publish event' %></button></div>
-      <%- include('partials/editor-form',{kind:'events',item,assets}) %></details><% } %></div><p class="empty-state" data-no-records hidden>No events match these filters.</p></div>
-    <section class="editor-section" id="edit-activities"><div class="section-heading"><div><p class="eyebrow">LEARNING & HIGHLIGHTS</p><h2>Activities.</h2></div></div><details class="editor-item new-item"><summary>+ Add an activity</summary><%- include('partials/editor-form',{kind:'activities',item:{published:false},assets}) %></details><% for(const item of activities) { %><details class="editor-item"><summary><span><%= item.title %></span><span class="badge"><%= item.published?'Published':'Draft' %></span></summary><%- include('partials/editor-form',{kind:'activities',item,assets}) %></details><% } %></section>
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">02 / EXPERIENCES</p>
+        <h2>Events.</h2>
+      </div>
+      <a href="/events" target="_blank" rel="noopener" class="text-link">Preview public events ↗</a>
+    </div>
+
+    <details class="editor-item new-item">
+      <summary>+ Add an event</summary>
+      <%- include('partials/editor-form',{kind:'events',item:{published:false},assets}) %>
+    </details>
+
+    <div data-record-list="events">
+      <%- include('partials/admin-filters',{kind:'events'}) %>
+      <div data-record-items>
+        <% for(const item of events) { %>
+          <details class="editor-item record-item" data-record data-search="<%= (item.title+' '+item.location+' '+item.category).toLowerCase() %>" data-status="<%= item.published?'published':'draft' %>" data-category="<%= item.category %>" data-date="<%= item.date %>" data-name="<%= item.title %>">
+            <summary>
+              <span class="record-thumb">
+                <% if(item.image) { %>
+                  <img src="<%= item.image %>" width="100" height="80" alt="" loading="lazy">
+                <% } else { %>
+                  <span>C/</span>
+                <% } %>
+              </span>
+
+              <span class="record-summary">
+                <strong><%= item.title %></strong>
+                <span><%= formatDate(item.date) %> · <%= item.location %></span>
+                <span><%= item.category %> · <%= (item.gallery||[]).length %> photos · <%= eventState(item) %></span>
+              </span>
+
+              <span class="badge"><%= item.published?'Published':'Draft' %></span>
+            </summary>
+
+            <div class="record-actions">
+              <a class="text-link" href="/admin/events/<%= item.id %>/preview" target="_blank" rel="noopener">Preview event ↗</a>
+              <button type="button" class="button button-outline" data-publish-toggle><%= item.published?'Unpublish':'Publish event' %></button>
+            </div>
+
+            <%- include('partials/editor-form',{kind:'events',item,assets}) %>
+          </details>
+        <% } %>
+      </div>
+
+      <p class="empty-state" data-no-records hidden>No events match these filters.</p>
+    </div>
+
+    <section class="editor-section" id="edit-activities">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">LEARNING & HIGHLIGHTS</p>
+          <h2>Activities.</h2>
+        </div>
+      </div>
+
+      <details class="editor-item new-item">
+        <summary>+ Add an activity</summary>
+        <%- include('partials/editor-form',{kind:'activities',item:{published:false},assets}) %>
+      </details>
+
+      <% for(const item of activities) { %>
+        <details class="editor-item">
+          <summary>
+            <span><%= item.title %></span>
+            <span class="badge"><%= item.published?'Published':'Draft' %></span>
+          </summary>
+          <%- include('partials/editor-form',{kind:'activities',item,assets}) %>
+        </details>
+      <% } %>
+    </section>
   </section>
-  <section id="edit-team" class="admin-panel editor-section" data-admin-panel><div class="section-heading"><div><p class="eyebrow">03 / PEOPLE</p><h2>Team members.</h2></div><a class="text-link" href="/team" target="_blank" rel="noopener">Preview team ↗</a></div><p class="muted">Publish approved profiles here. Private membership contacts remain in Join Requests.</p>
-    <details class="editor-item new-item"><summary>+ Add a team member</summary><%- include('partials/editor-form',{kind:'team',item:{published:false},assets}) %></details>
-    <div data-record-list="team"><%- include('partials/admin-filters',{kind:'team'}) %><div data-record-items><% for(const item of team) { %><details class="editor-item record-item" data-record data-search="<%= (item.name+' '+item.role+' '+(item.department||'')).toLowerCase() %>" data-name="<%= item.name %>" data-status="<%= item.published?'published':'draft' %>"><summary><span class="record-thumb portrait-thumb"><% if(item.image) { %><img src="<%= item.image %>" width="72" height="80" alt="" loading="lazy"><% } else { %><span><%= item.name[0] %></span><% } %></span><span class="record-summary"><strong><%= item.name %></strong><span><%= item.role %></span><span><%= item.department||'Department awaiting confirmation' %></span></span><span class="badge"><%= item.published?'Published':'Draft' %></span></summary><%- include('partials/editor-form',{kind:'team',item,assets}) %></details><% } %></div><p class="empty-state" data-no-records hidden>No members match these filters.</p></div>
+
+  <section id="edit-team" class="admin-panel editor-section" data-admin-panel>
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">03 / PEOPLE</p>
+        <h2>Team members.</h2>
+      </div>
+      <a class="text-link" href="/team" target="_blank" rel="noopener">Preview team ↗</a>
+    </div>
+
+    <p class="muted">Publish approved profiles here. Private membership contacts remain in Join Requests.</p>
+
+    <details class="editor-item new-item">
+      <summary>+ Add a team member</summary>
+      <%- include('partials/editor-form',{kind:'team',item:{published:false},assets}) %>
+    </details>
+
+    <div data-record-list="team">
+      <%- include('partials/admin-filters',{kind:'team'}) %>
+
+      <div data-record-items>
+        <% for(const item of team) { %>
+          <details class="editor-item record-item" data-record data-search="<%= (item.name+' '+item.role+' '+(item.department||'')).toLowerCase() %>" data-name="<%= item.name %>" data-status="<%= item.published?'published':'draft' %>">
+            <summary>
+              <span class="record-thumb portrait-thumb">
+                <% if(item.image) { %>
+                  <img src="<%= item.image %>" width="72" height="80" alt="" loading="lazy">
+                <% } else { %>
+                  <span><%= item.name[0] %></span>
+                <% } %>
+              </span>
+
+              <span class="record-summary">
+                <strong><%= item.name %></strong>
+                <span><%= item.role %></span>
+                <span><%= item.department||'Department awaiting confirmation' %></span>
+              </span>
+
+              <span class="badge"><%= item.published?'Published':'Draft' %></span>
+            </summary>
+
+            <%- include('partials/editor-form',{kind:'team',item,assets}) %>
+          </details>
+        <% } %>
+      </div>
+
+      <p class="empty-state" data-no-records hidden>No members match these filters.</p>
+    </div>
   </section>
-  <section id="edit-domains" class="admin-panel editor-section" data-admin-panel><div class="section-heading"><div><p class="eyebrow">04 / CIPHER FOCUS</p><h2>Domains.</h2></div><a class="text-link" href="/#domains" target="_blank" rel="noopener">Preview domains ↗</a></div><p class="muted">Manage the public “What we do” domains here. Adding one keeps every existing domain and places the new entry after them by default.</p><details class="editor-item new-item"><summary>+ Add a domain</summary><%- include('partials/editor-form',{kind:'domains',item:{published:false,order:Math.min(999,Math.max(-1,...domains.map(domain=>domain.order||0))+1)},assets}) %></details><% for(const item of domains) { %><details class="editor-item"><summary><span><%= item.title %></span><span class="badge"><%= item.published?'Published':'Draft' %></span></summary><%- include('partials/editor-form',{kind:'domains',item,assets}) %></details><% } %></section>
-  <section id="join-requests" class="admin-panel editor-section" data-admin-panel><div class="section-heading"><div><p class="eyebrow">05 / COMMUNITY</p><h2>Join requests.</h2></div></div><%- include('partials/admin-inbox',{purpose:'join'}) %><%- include('partials/admin-members') %></section>
-  <section id="contact-messages" class="admin-panel editor-section" data-admin-panel><div class="section-heading"><div><p class="eyebrow">06 / CONNECTIONS</p><h2>Contact messages.</h2></div></div><%- include('partials/admin-inbox',{purpose:'contact'}) %></section>
-  <section id="mail-center" class="admin-panel editor-section" data-admin-panel><div class="section-heading"><div><p class="eyebrow">07 / MAIL CENTER</p><h2>Individual or group mail.</h2></div></div><div class="mail-health form-panel"><div><p class="eyebrow">MAILBOX CONNECTION</p><h3><%= mailConfigured?'Settings found':'Setup required' %></h3><p>Test the real sender mailbox before sending. Incoming website forms are stored in Contact Messages and Join Requests even if email delivery is unavailable.</p></div><button class="button button-outline" id="verify-mail" type="button">Test mailbox connection</button><p class="editor-status" id="mail-verify-status" role="status" aria-live="polite"></p></div><div class="mail-mode-grid"><article class="overview-module"><p class="eyebrow">ONE PERSON</p><h3>Reply individually.</h3><p>Open the person’s saved request and use its private email form.</p><div class="button-row"><a class="button button-outline" href="#join-requests">Join applicants</a><a class="button button-outline" href="#contact-messages">Contact messages</a></div></article><article class="overview-module"><p class="eyebrow">EVERYONE</p><h3>Send safely in bulk.</h3><p>Preview the complete recipient list before confirming. Every address receives a separate message.</p><a class="text-link" href="#bulk-email">Compose group message ↓</a></article></div><%- include('partials/admin-bulk') %><%- include('partials/admin-outbox') %></section>
-  <section id="settings" class="admin-panel editor-section" data-admin-panel><div class="section-heading"><div><p class="eyebrow">08 / YOUR WEBSITE</p><h2>Settings.</h2></div></div><%- include('partials/admin-settings') %></section>
-</section><%- include('partials/footer') %>
+
+  <section id="edit-domains" class="admin-panel editor-section" data-admin-panel>
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">04 / CIPHER FOCUS</p>
+        <h2>Domains.</h2>
+      </div>
+      <a class="text-link" href="/#domains" target="_blank" rel="noopener">Preview domains ↗</a>
+    </div>
+
+    <p class="muted">Manage the public “What we do” domains here. Adding one keeps every existing domain and places the new entry after them by default.</p>
+
+    <details class="editor-item new-item">
+      <summary>+ Add a domain</summary>
+      <%- include('partials/editor-form',{kind:'domains',item:{published:false,order:Math.min(999,Math.max(-1,...domains.map(domain=>domain.order||0))+1)},assets}) %>
+    </details>
+
+    <% for(const item of domains) { %>
+      <details class="editor-item">
+        <summary>
+          <span><%= item.title %></span>
+          <span class="badge"><%= item.published?'Published':'Draft' %></span>
+        </summary>
+        <%- include('partials/editor-form',{kind:'domains',item,assets}) %>
+      </details>
+    <% } %>
+  </section>
+
+  <section id="join-requests" class="admin-panel editor-section" data-admin-panel>
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">05 / COMMUNITY</p>
+        <h2>Join requests.</h2>
+      </div>
+    </div>
+
+    <%- include('partials/admin-inbox',{purpose:'join'}) %>
+    <%- include('partials/admin-members') %>
+  </section>
+
+  <section id="contact-messages" class="admin-panel editor-section" data-admin-panel>
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">06 / CONNECTIONS</p>
+        <h2>Contact messages.</h2>
+      </div>
+    </div>
+
+    <%- include('partials/admin-inbox',{purpose:'contact'}) %>
+  </section>
+
+  <section id="mail-center" class="admin-panel editor-section" data-admin-panel>
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">07 / MAIL CENTER</p>
+        <h2>Individual or group mail.</h2>
+      </div>
+    </div>
+
+    <div class="mail-health form-panel">
+      <div>
+        <p class="eyebrow">MAILBOX CONNECTION</p>
+        <h3><%= mailConfigured?'Settings found':'Setup required' %></h3>
+        <p>Test the real sender mailbox before sending. Incoming website forms are stored in Contact Messages and Join Requests even if email delivery is unavailable.</p>
+      </div>
+
+      <button class="button button-outline" id="verify-mail" type="button">Test mailbox connection</button>
+      <p class="editor-status" id="mail-verify-status" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="mail-mode-grid">
+      <article class="overview-module">
+        <p class="eyebrow">ONE PERSON</p>
+        <h3>Reply individually.</h3>
+        <p>Open the person’s saved request and use its private email form.</p>
+
+        <div class="button-row">
+          <a class="button button-outline" href="#join-requests">Join applicants</a>
+          <a class="button button-outline" href="#contact-messages">Contact messages</a>
+        </div>
+      </article>
+
+      <article class="overview-module">
+        <p class="eyebrow">EVERYONE</p>
+        <h3>Send safely in bulk.</h3>
+        <p>Preview the complete recipient list before confirming. Every address receives a separate message.</p>
+        <a class="text-link" href="#bulk-email">Compose group message ↓</a>
+      </article>
+    </div>
+
+    <%- include('partials/admin-bulk') %>
+    <%- include('partials/admin-outbox') %>
+  </section>
+
+  <section id="settings" class="admin-panel editor-section" data-admin-panel>
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">08 / YOUR WEBSITE</p>
+        <h2>Settings.</h2>
+      </div>
+    </div>
+
+    <%- include('partials/admin-settings') %>
+  </section>
+
+</section>
+
+<%- include('partials/footer') %>
