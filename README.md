@@ -2,6 +2,8 @@
 
 Official student-association website for CIPHER, Department of Computer Science and Engineering, St. Joseph Engineering College.
 
+Live site: **https://cipher-buildblazer-chi.vercel.app**
+
 The project is a maintainable Node.js and Express application with server-rendered EJS pages, MongoDB persistence, a protected content studio, real contact and membership workflows, SMTP delivery, responsive layouts, and the supplied CIPHER black-and-green visual identity.
 
 ## Website
@@ -55,6 +57,8 @@ The application is prepared for Vercel's Express runtime. Production requires:
 - SMTP settings when real email delivery is required
 
 Admin-uploaded images are optimized and stored in MongoDB, so they remain available across Vercel Function restarts. Secrets, local credentials, uploads and development databases are excluded from Git.
+
+The current production deployment uses Vercel Functions and a connected MongoDB Atlas free-tier database. Existing CIPHER content, the editor account, submissions, mail history and uploaded media have been migrated to that database.
 
 Existing local records can be copied into a new production database without deleting records already there:
 

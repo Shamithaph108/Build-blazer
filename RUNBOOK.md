@@ -147,7 +147,9 @@ Tests use isolated temporary databases and test-only accounts, not the local inb
 
 This is a **stateful Node/MongoDB app** prepared for Vercel Functions as well as a conventional Node or Docker host. A static-only upload cannot run its forms or editor. Content, accounts, sessions, submissions, mail history and optimized admin-uploaded images are stored in MongoDB so Vercel restarts do not lose them.
 
-Local build: `npm ci && npm run build`. Local production start: `npm start`. Vercel uses the root `index.js` Express entry and `vercel.json` configuration.
+Local build: `npm ci && npm run build`. Local production start: `npm start`. Vercel uses `api/index.js` as its Express Function entry and routes all requests to it through `vercel.json`.
+
+Current production URL: `https://cipher-buildblazer-chi.vercel.app`
 
 Set these private deployment environment variables:
 
@@ -178,7 +180,7 @@ Optional Docker preparation: `docker build -t cipher .`; run with the same envir
 - Confirm official association email, social/profile links, membership process, and inbox owner. Unverified links are not invented.
 - Supply original Lumière photographs and a clean logo export. The available logo JPG is visibly corrupted; clean video crops are used as documented in `docs/SOURCES.md`.
 - Obtain organiser confirmation if needed for using this supplied video in place of the rulebook's Figma handoff. The team explicitly authorised this video as the implementation reference.
-- Fill in confirmed team-member details in README and provide the live deployment URL.
+- Fill in confirmed team-member details in README.
 - Confirm the deadline and submission method (PR or organiser form), then submit the fork URL plus public deployment URL.
 
 Official implementation references: [Express security guidance](https://expressjs.com/en/advanced/best-practice-security.html), [Node SQLite API](https://nodejs.org/api/sqlite.html).
