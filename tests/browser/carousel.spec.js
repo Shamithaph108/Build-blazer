@@ -4,7 +4,7 @@ import AxeBuilder from '@axe-core/playwright';
 test('public content carousels support arrows, keyboard, drag and filtered events',async({page,isMobile},info)=>{
   test.setTimeout(60000);const errors=[];page.on('pageerror',error=>errors.push(error.message));
   await page.goto('/#about');await expect(page.locator('[data-motion-toggle]')).toHaveCount(0);
-  for(const [name,minimum] of [['CIPHER moments',4],['Domains',4],['Leadership',5],['Events and workshops',2],['Activities',17]]){
+  for(const [name,minimum] of [['CIPHER moments',4],['Domains',4],['Events and workshops',2]]){
     const region=page.getByRole('region',{name,exact:true});
     const total=await region.locator('.carousel-slot:not([hidden])').count();expect(total).toBeGreaterThanOrEqual(minimum);
     await region.getByRole('button',{name:`Next: ${name}`,exact:true}).click();
@@ -13,7 +13,21 @@ test('public content carousels support arrows, keyboard, drag and filtered event
     await region.locator('.carousel-track').focus();await page.keyboard.press('Home');
     await expect(region.locator('.carousel-count')).toHaveText(`01 / ${String(total).padStart(2,'0')}`);
   }
+  const leadership=page.locator('.reference-team-window'),leadershipTrack=leadership.locator('.reference-team-track');
+  await leadership.scrollIntoViewIfNeeded();const leadershipBefore=await leadershipTrack.evaluate(el=>getComputedStyle(el).transform);
+  await page.getByRole('button',{name:'Next leaders',exact:true}).click();
+  await expect.poll(()=>leadershipTrack.evaluate(el=>getComputedStyle(el).transform)).not.toBe(leadershipBefore);
+  await page.emulateMedia({reducedMotion:'reduce'});
+  const reducedBefore=await leadershipTrack.evaluate(el=>getComputedStyle(el).transform);
+  await page.getByRole('button',{name:'Next leaders',exact:true}).click();
+  await expect.poll(()=>leadershipTrack.evaluate(el=>getComputedStyle(el).transform)).not.toBe(reducedBefore);
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await expect(page.locator('#activities .reference-activity')).toHaveCount(17);
+  await expect(page.locator('#activities .carousel-shell')).toHaveCount(0);
   const photos=page.getByRole('region',{name:'CIPHER moments',exact:true}),track=photos.locator('.carousel-track');
+  const photo=photos.locator('.moment-card img').first();
+  await expect(photo).toHaveCSS('position','static');
+  expect(await photo.evaluate(el=>el.getBoundingClientRect().width/el.closest('.moment-card').getBoundingClientRect().width)).toBeGreaterThan(.95);
   await track.scrollIntoViewIfNeeded();const box=await track.boundingBox();
   if(!isMobile){await page.mouse.move(box.x+box.width*.8,box.y+box.height*.4);await page.mouse.down();await page.mouse.move(box.x+box.width*.15,box.y+box.height*.4,{steps:12});await page.mouse.up();}
   else{
