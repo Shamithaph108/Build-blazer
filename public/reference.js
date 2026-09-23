@@ -156,11 +156,11 @@
   new ResizeObserver(prepareWord).observe(word.parentElement);document.fonts.ready.then(prepareWord);resizeField();prepareWord();
   addEventListener('resize',resizeField);
 
-  // A seamless leadership deck with clear slide/rest phases, plus hover/focus pause and drag.
+  // A seamless, slow-moving leadership strip; pause on hover/focus and drag to inspect.
   const track=document.querySelector('.reference-team-track'),trackWindow=document.querySelector('.reference-team-window');
   let trackVisible=false;
   new IntersectionObserver(entries=>trackVisible=entries[0].isIntersecting).observe(trackWindow);
-  const originals=[...track.children];let trackOffset=0,trackLength=0,trackPaused=false,drag=null;
+  const originals=[...track.children];let trackOffset=0,trackLength=0,trackPaused=false,manualTrackPause=false,drag=null;
   const carouselManaged=track.hasAttribute('data-carousel');
   if(!carouselManaged&&originals.length>1){originals.forEach(card=>{const clone=card.cloneNode(true);clone.dataset.clone='true';clone.setAttribute('aria-hidden','true');clone.querySelectorAll('template').forEach(t=>t.remove());clone.querySelectorAll('button,a').forEach(control=>control.tabIndex=-1);track.append(clone);});}
   function measureTrack(){const firstClone=track.querySelector('[data-clone]');trackLength=firstClone?firstClone.offsetLeft-originals[0].offsetLeft:0;}
@@ -172,24 +172,6 @@
     addEventListener('pointermove',event=>{if(drag){const delta=event.clientX-drag.x;drag.moved ||= Math.abs(delta)>5;if(drag.moved){trackOffset=drag.start-delta;if(trackLength)trackOffset=(trackOffset%trackLength+trackLength)%trackLength;track.style.transform=`translateX(${-trackOffset}px)`;}}});
     let suppressClick=false;addEventListener('pointerup',()=>{if(drag){suppressClick=drag.moved;drag=null;trackPaused=false;later(()=>suppressClick=false,0);}});
     trackWindow.addEventListener('click',event=>{if(suppressClick){event.preventDefault();event.stopPropagation();}},true);
-    let stepTimer=0;
-    function slideTrack(direction){
-      if(!trackLength||!originals.length)return;
-      const stride=originals.length>1?originals[1].offsetLeft-originals[0].offsetLeft:originals[0].offsetWidth;
-      trackPaused=true;clearTimeout(stepTimer);timers.delete(stepTimer);
-      if(direction<0&&trackOffset<stride*.5){trackOffset+=trackLength;track.style.transition='none';track.style.transform=`translate3d(${-trackOffset}px,0,0)`;track.getBoundingClientRect();}
-      trackOffset+=direction*stride;
-      track.style.transition=motion.matches?'none':'transform .72s cubic-bezier(.16,1,.3,1)';
-      track.style.transform=`translate3d(${-trackOffset}px,0,0)`;
-      stepTimer=later(()=>{
-        track.style.transition='';
-        if(trackOffset>=trackLength){trackOffset-=trackLength;track.style.transform=`translate3d(${-trackOffset}px,0,0)`;}
-        if(trackOffset<0){trackOffset+=trackLength;track.style.transform=`translate3d(${-trackOffset}px,0,0)`;}
-        trackPaused=Boolean(drag||track.matches(':hover')||track.contains(document.activeElement));
-      },motion.matches?0:760);
-    }
-    document.querySelectorAll('[data-team-step]').forEach(button=>button.addEventListener('click',()=>slideTrack(Number(button.dataset.teamStep))));
-    const autoStep=setInterval(()=>{if(!motion.matches&&!document.hidden&&trackVisible&&!trackPaused&&!detail.open&&!intro.open)slideTrack(1);},3200);timers.add(autoStep);
   }
   const collage=document.querySelector('.reference-collage'),collageCarousel=collage.hasAttribute('data-carousel');let collageVisible=true;new IntersectionObserver(entries=>collageVisible=entries[0].isIntersecting).observe(collage);
   const collagePhotos=[...collage.querySelectorAll('img')];
@@ -215,8 +197,8 @@
   detail.addEventListener('close',()=>document.body.append(cursor));
 
   function animate(time){
-    animationFrame=requestAnimationFrame(animate);if(document.hidden||time-lastTime<32)return;lastTime=time;
-    if(!motion.matches){drawField(time);drawWord(time);
+    animationFrame=requestAnimationFrame(animate);if(document.hidden||time-lastTime<32)return;const delta=Math.min(60,time-lastTime);lastTime=time;
+    if(!motion.matches){drawField(time);drawWord(time);if(trackVisible&&trackLength&&!trackPaused&&!manualTrackPause&&!detail.open&&!intro.open){trackOffset=(trackOffset+delta*.036)%trackLength;track.style.transform=`translateX(${-trackOffset}px)`;}
       if(collageVisible&&!collageCarousel){
         collagePointer.x+=(collagePointer.targetX-collagePointer.x)*.12;
         collagePointer.y+=(collagePointer.targetY-collagePointer.y)*.12;

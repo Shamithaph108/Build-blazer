@@ -28,10 +28,6 @@
   <link rel="stylesheet" href="/assets/premium.css?v=<%= assetVersion %>">
   <script src="/assets/stack-gallery.js?v=<%= assetVersion %>" defer></script>
   <script src="/assets/premium.js?v=<%= assetVersion %>" defer></script>
-  <% if(!currentPath.startsWith('/admin')) { %>
-  <link rel="stylesheet" href="/assets/carousel.css?v=<%= assetVersion %>">
-  <script src="/assets/carousel.js?v=<%= assetVersion %>" defer></script>
-  <% } %>
 </head>
 <body id="top" class="<%= currentPath==='/'?'reference-site':currentPath.startsWith('/admin')?'admin-site':'' %>">
 <a class="skip-link" href="#main">Skip to content</a>

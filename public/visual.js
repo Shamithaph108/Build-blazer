@@ -13,10 +13,10 @@
   const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
     if(entry.isIntersecting){entry.target.classList.add('is-revealed');observer.unobserve(entry.target);}
   }),{threshold:0,rootMargin:'0px 0px -35px 0px'});
-  document.querySelectorAll('main > section,.editor-section,.studio-heading,.site-footer').forEach(section=>{
+  document.querySelectorAll('main > section,.editor-section,.studio-heading').forEach(section=>{
     section.classList.add('reveal-target');
     if(!stopped()&&section.getBoundingClientRect().top>innerHeight*.9)section.classList.add('reveal-pending');
-    section.querySelectorAll('.reference-domains,.reference-events,.reference-activity-grid,.event-grid,.team-grid,.editor-section,.footer-grid,.footer-bottom').forEach(group=>{
+    section.querySelectorAll('.reference-domains,.reference-events,.reference-activity-grid,.event-grid,.team-grid,.editor-section').forEach(group=>{
       [...group.children].filter(card=>card.tagName!=='TEMPLATE' && !card.classList.contains('section-heading')).forEach((card,index)=>{
         card.classList.add('reveal-card');card.style.setProperty('--arrival-delay',`${Math.min(index,5)*65}ms`);
       });

@@ -27,14 +27,7 @@
     const left=slot=>slot.offsetLeft-parseFloat(getComputedStyle(track).paddingLeft);
     function mark(index){
       active=Math.max(0,Math.min(index,visible.length-1));
-      slots.forEach(slot=>{
-        const i=visible.indexOf(slot),offset=Math.max(-2,Math.min(2,i-active)),distance=Math.abs(offset);
-        slot.classList.toggle('is-active',i===active);
-        slot.style.setProperty('--slide-x',`${offset*-13}px`);
-        slot.style.setProperty('--slide-y',`${distance*9}px`);
-        slot.style.setProperty('--slide-turn',`${offset*-4.5}deg`);
-        slot.style.setProperty('--slide-scale',String(1-distance*.035));
-      });
+      slots.forEach(slot=>{const i=visible.indexOf(slot);slot.classList.toggle('is-active',i===active);slot.style.setProperty('--slide-distance',Math.min(2,Math.abs(i-active)));});
       const position=visible.length?`${pad(active+1)} / ${pad(visible.length)}`:'00 / 00';if(count.textContent!==position)count.textContent=position;
       fill.style.transform=`scaleX(${visible.length?(active+1)/visible.length:0})`;
       previous.disabled=next.disabled=visible.length<2;
@@ -43,11 +36,6 @@
       if(!visible.length)return;
       const target=(index+visible.length)%visible.length;mark(target);
       track.scrollTo({left:left(visible[target]),behavior:instant||motion.matches?'instant':'smooth'});
-    }
-    function nearest(){
-      if(!visible.length)return 0;let closest=0;
-      visible.forEach((slot,index)=>{if(Math.abs(left(slot)-track.scrollLeft)<Math.abs(left(visible[closest])-track.scrollLeft))closest=index;});
-      return closest;
     }
     function refresh(){
       slots.forEach((slot,i)=>slot.hidden=cards[i].hidden);visible=slots.filter(slot=>!slot.hidden);
@@ -61,24 +49,23 @@
       if(event.key==='Home'||event.key==='End'){event.preventDefault();go(event.key==='Home'?0:visible.length-1);}
     });
     track.addEventListener('scroll',()=>{
-      if(frame)return;frame=requestAnimationFrame(()=>{frame=0;if(visible.length)mark(nearest());});
+      if(frame)return;frame=requestAnimationFrame(()=>{frame=0;if(!visible.length)return;let closest=0;visible.forEach((slot,index)=>{if(Math.abs(left(slot)-track.scrollLeft)<Math.abs(left(visible[closest])-track.scrollLeft))closest=index;});mark(closest);});
     },{passive:true});
     track.addEventListener('focusin',event=>{
       const slot=event.target.closest('.carousel-slot');if(!slot)return;const a=slot.getBoundingClientRect(),b=track.getBoundingClientRect();
       if(a.left<b.left||a.right>b.right)go(visible.indexOf(slot),true);
     });
-    track.addEventListener('mousedown',event=>{
-      suppress=false;if(event.button!==0)return;
-      drag={x:event.clientX,left:track.scrollLeft,moved:false};
-      track.classList.add('is-dragging');event.preventDefault();
+    track.addEventListener('pointerdown',event=>{
+      suppress=false;if(event.pointerType!=='mouse'||event.button!==0)return;
+      drag={x:event.clientX,left:track.scrollLeft,id:event.pointerId,moved:false};
     });
-    addEventListener('mousemove',event=>{
+    track.addEventListener('pointermove',event=>{
       if(!drag)return;const dx=event.clientX-drag.x;
-      if(Math.abs(dx)>6){drag.moved=true;suppress=true;}
+      if(Math.abs(dx)>6){drag.moved=true;suppress=true;track.classList.add('is-dragging');track.setPointerCapture(drag.id);}
       if(drag.moved){event.preventDefault();track.scrollLeft=drag.left-dx;}
     });
-    const finish=()=>{if(!drag)return;const moved=drag.moved,target=moved?nearest():active;drag=null;track.classList.remove('is-dragging');if(moved)requestAnimationFrame(()=>go(target));};
-    addEventListener('mouseup',finish);
+    const finish=()=>{if(!drag)return;const moved=drag.moved;drag=null;track.classList.remove('is-dragging');if(moved)requestAnimationFrame(()=>go(active));};
+    track.addEventListener('pointerup',finish);track.addEventListener('pointercancel',finish);
     track.addEventListener('click',event=>{if(suppress){event.preventDefault();event.stopImmediatePropagation();suppress=false;}},true);
     const filtering=new MutationObserver(refresh);cards.forEach(card=>filtering.observe(card,{attributes:true,attributeFilter:['hidden']}));
     new ResizeObserver(()=>go(active,true)).observe(track);
