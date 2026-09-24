@@ -1,6 +1,6 @@
 ## Announcements
 
-Open `/admin#announcements`, enter a title and message, optionally add a website path or HTTPS link, check **Published**, and save. The notice appears below the homepage hero, outside the navigation. Uncheck Published to keep a saved draft. MongoDB stores the notice in `settings`, under `key: announcement`.
+Open `/admin#announcements`, enter a title and message, optionally add a website path or HTTPS link, check **Published**, and save. The Announcements button sits below the menu at the top right of the homepage and opens all published notices. Use Add another announcement to keep earlier notices. Uncheck Published to keep a saved draft. MongoDB stores the notice in `settings`, under `key: announcement`.
 
 ## Website chatbot
 
@@ -20,4 +20,4 @@ Existing accounts must verify a recovery email while signed in before Forgot pas
 
 `npm test` includes the isolated database integration test for publication, draft privacy, chatbot access, verification, password reset and token reuse. `npm run test:browser -- tests/browser/community.spec.js` checks desktop/mobile controls. Tests use temporary databases and simulated email delivery, never production recipients.
 
-Use Delete announcement and confirm to clear the saved notice and remove it from the homepage.
+Use Delete all announcements and confirm to clear the saved notices and remove them from the popup.

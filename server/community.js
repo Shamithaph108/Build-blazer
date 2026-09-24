@@ -3,7 +3,8 @@ import {readSiteSettings,eventState} from './studio.js';
 
 export async function readAnnouncement(db){
   const row=await db.collection('settings').findOne({key:'announcement'});
-  return {title:'',message:'',link:'',published:false,...row?.value,version:row?.version||0};
+  const value={title:'',message:'',link:'',published:false,...row?.value,version:row?.version||0};
+  return {...value,entries:[...(value.title?[{title:value.title,message:value.message,link:value.link,published:value.published}]:[]),...(value.history||[])]};
 }
 const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const reply=(answer,label,href)=>({answer,sources:label?[{label,href}]:[]});
@@ -13,8 +14,8 @@ export function answerWebsiteQuestion(question,{events,team,activities,domains,s
   const names=events.some(e=>normalize(e.title).split(' ').filter(t=>t.length>3&&!['event','events','workshop','workshops','competition'].includes(t)).some(t=>q.split(' ').includes(t)));
   if(/^(hi|hello|hey|help|thanks|thank you)$/.test(q))return reply('Hello! Ask me about CIPHER, joining, events, leadership, announcements or contact details. I answer from published website content only.');
   if(/\b(password|secret|token|database|applicants|private|admin|smtp)\b/.test(q))return reply('I can only help with public CIPHER website information. I cannot access private admin details, applications or messages.');
-  if(/\b(announcement|announcements|notice|notices)\b/.test(q))return announcement.published
-    ?reply(`${announcement.title}\n\n${announcement.message}`,'Homepage announcement','/#announcement')
+  if(/\b(announcement|announcements|notice|notices)\b/.test(q))return announcement.entries.some(a=>a.published)
+    ?reply(announcement.entries.filter(a=>a.published).map(a=>`${a.title}\n${a.message}`).join('\n\n'),'Homepage announcement','/#announcement')
     :reply('There is no published announcement right now.','Home','/');
   if(/\b(join|membership|apply|application|register|registration)\b/.test(q)&&!names)return reply('Use Join / Contact to submit your name, email and message, and select the membership option. The team reviews applications privately. Event-specific registration details are only available when published in that event.','Join / Contact','/join');
   if(/\b(contact|email|address|location|where|reach)\b/.test(q)&&!names)return reply(`CIPHER is the CSE student association at St. Joseph Engineering College.\n${settings.address}\n${settings.contactEmail?`Email: ${settings.contactEmail}`:'Use the Contact form to reach the team; a public email address has not been supplied.'}`,'Contact the team','/contact');
@@ -43,7 +44,7 @@ export function communityRoutes(app,{db,requireAdmin,listContent}){
   app.delete('/api/admin/announcement',requireAdmin,async(req,res)=>{
     const {version}=req.body;
     if(!Number.isSafeInteger(version)||version<1)return res.status(422).json({error:'Reload the announcement before deleting.'});
-    const result=await db.collection('settings').updateOne({key:'announcement',version},{$set:{value:{title:'',message:'',link:'',published:false}},$inc:{version:1}});
+    const result=await db.collection('settings').updateOne({key:'announcement',version},{$set:{value:{title:'',message:'',link:'',published:false,history:[]}},$inc:{version:1}});
     if(!result.matchedCount)return res.status(409).json({error:'Announcement changed. Reload before deleting.'});
     await db.collection('admin_activity').insertOne({actor:req.session.username,action:'DELETE_ANNOUNCEMENT',path:'/api/admin/announcement',created_at:new Date().toISOString()});
     res.json({ok:true,message:'Announcement deleted.'});
@@ -52,13 +53,16 @@ export function communityRoutes(app,{db,requireAdmin,listContent}){
     const {title,message,link='',published,version}=req.body;
     if(typeof title!=='string'||typeof message!=='string'||typeof link!=='string'||title.trim().length>120||message.trim().length>1500||link.length>500||/[<>\x00-\x08]/.test(title+message)||typeof published!=='boolean'||!Number.isSafeInteger(version)||version<0||published&&(!title.trim()||!message.trim()))return res.status(422).json({error:'Use a title (up to 120 characters) and message (up to 1,500 characters) before publishing.'});
     if(link){try{const url=new URL(link,'https://cipher.invalid');if((!(link.startsWith('/')&&!link.startsWith('//'))&&!link.startsWith('https://'))||url.username||url.password||/[\s\\<>]/.test(link))throw Error();}catch{return res.status(422).json({error:'Use a website path such as /events, or a complete HTTPS link.'});}}
-    const value={title:title.trim(),message:message.trim(),link:link.trim(),published};
+    const current=await readAnnouncement(db);
+    const history=req.body.append===true?current.entries:(current.history||[]);
+    if(history.length>=50)return res.status(422).json({error:'Up to 50 announcements are supported. Delete old announcements before adding more.'});
+    const value={title:title.trim(),message:message.trim(),link:link.trim(),published,history};
     try{
       const result=await db.collection('settings').updateOne({key:'announcement',version:version||{$exists:false}},{$set:{value},$inc:{version:1}},{upsert:version===0});
       if(!result.matchedCount&&!result.upsertedCount)return res.status(409).json({error:'Announcement changed in another session. Reload before saving.'});
     }catch(error){if(error.code===11000)return res.status(409).json({error:'Announcement changed in another session. Reload before saving.'});throw error;}
     await db.collection('admin_activity').insertOne({actor:req.session.username,action:'UPDATE_ANNOUNCEMENT',path:'/api/admin/announcement',created_at:new Date().toISOString()});
-    res.json({ok:true,message:published?'Announcement published below the homepage hero.':'Announcement saved and hidden from visitors.'});
+    res.json({ok:true,message:published?'Announcement published in the announcements popup.':'Announcement saved and hidden from visitors.'});
   });
   app.post('/api/chat',rateLimit({windowMs:15*60*1000,limit:40,standardHeaders:'draft-8',legacyHeaders:false,message:{error:'Please wait before asking more questions.'}}),async(req,res)=>{
     if(typeof req.body.question!=='string'||!req.body.question.trim()||req.body.question.length>500)return res.status(422).json({error:'Ask a question of 1–500 characters.'});

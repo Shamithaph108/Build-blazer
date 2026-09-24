@@ -1,4 +1,7 @@
 (() => {
+  const notices=document.querySelector('#announcements-dialog'),noticesButton=document.querySelector('[data-announcements-open]');
+  if(notices){noticesButton.addEventListener('click',()=>notices.showModal());notices.querySelector('[data-announcements-close]').addEventListener('click',()=>notices.close());notices.addEventListener('close',()=>noticesButton.focus());}
+
   const dialog=document.querySelector('#cipher-chat');if(!dialog)return;
   const launch=document.querySelector('.cipher-chat-launch'),form=dialog.querySelector('form'),messages=dialog.querySelector('.chat-messages'),status=dialog.querySelector('[data-chat-status]');
   launch.addEventListener('click',()=>{dialog.showModal();form.elements.question.focus();});

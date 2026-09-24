@@ -31,8 +31,10 @@ test('announcements, public-only chat and verified single-use password recovery'
   assert.doesNotMatch((await request('/')).text,/Verified test notice/);
   assert.doesNotMatch((await request('/api/chat',{question:'announcements'})).text,/Verified test notice/);
   assert.equal((await request('/api/admin/announcement',{...notice,version:2,link:'javascript:alert(1)'},'PUT')).status,422);
+  assert.equal((await request('/api/admin/announcement',{...notice,version:2,title:'Second announcement',append:true},'PUT')).status,200);
+  const multiple=await fixture.db.collection('settings').findOne({key:'announcement'});assert.equal(multiple.value.history.length,1);
   assert.equal((await request('/api/admin/announcement',{version:1},'DELETE')).status,409);
-  assert.equal((await request('/api/admin/announcement',{version:2},'DELETE')).status,200);
+  assert.equal((await request('/api/admin/announcement',{version:3},'DELETE')).status,200);
   const cleared=await fixture.db.collection('settings').findOne({key:'announcement'});assert.equal(cleared.value.message,'');assert.equal(cleared.value.published,false);
   assert.equal((await request('/api/admin/recovery-email',{email:'recover@example.com',currentPassword:'wrong'})).status,422);
   assert.equal((await request('/api/admin/recovery-email',{email:'recover@example.com',currentPassword:password})).status,200);

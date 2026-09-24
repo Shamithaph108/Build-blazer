@@ -46,7 +46,6 @@
       <% } %>
       <% if(currentPath.startsWith('/admin') && admin) { %><a href="/admin" aria-current="page">Dashboard</a><% } %>
     </nav>
-    <a href="<%= currentPath==='/'?'#join-contact':'/join' %>" class="button button-outline nav-cta">Join / Contact<% if(currentPath!=='/') { %><span aria-hidden="true">↗</span><% } %></a>
   </div>
 </header><% } else if(admin&&currentPath==='/admin') { %><%- include('admin-nav') %><% } else { %><header class="admin-auth-header"><a href="<%= admin?'/admin':'/' %>" class="admin-brand"><img src="/images/cipher-logo.webp" width="70" height="48" alt="CIPHER"><span><%= admin?'Back to dashboard':'CIPHER · Private editor' %></span></a></header><% } %>
 <main id="main">

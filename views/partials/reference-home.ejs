@@ -1,3 +1,5 @@
+<div class="announcement-shortcut"><button id="announcement" type="button" data-announcements-open aria-haspopup="dialog" aria-controls="announcements-dialog">Announcements <span><%= announcement.entries.filter(a=>a.published).length %></span></button></div>
+<dialog id="announcements-dialog" aria-labelledby="announcements-title"><div class="chat-heading"><h2 id="announcements-title">Announcements</h2><button type="button" data-announcements-close aria-label="Close announcements">&times;</button></div><div class="announcement-list"><% const notices=announcement.entries.filter(a=>a.published); if(!notices.length) { %><p>No announcements right now. Check back soon.</p><% } for(const notice of notices) { %><article><h3><%= notice.title %></h3><p class="preserve-lines"><%= notice.message %></p><% if(notice.link) { %><a class="text-link" href="<%= notice.link %>">Find out more &rarr;</a><% } %></article><% } %></div></dialog>
 <canvas id="contour-field" aria-hidden="true"></canvas>
 <section class="reference-hero" id="home" aria-labelledby="hero-title">
   <%- include('signal-field') %>
@@ -5,7 +7,6 @@
   <div class="hero-art"><canvas id="matrix-wordmark" aria-hidden="true"></canvas><h1 id="hero-title" class="hero-wordmark">CIPHER</h1></div>
   <div class="reference-hero-copy"><div><p class="eyebrow hero-decrypt" data-type-line>CREATE. CONNECT. COLLABORATE.</p><h2>Student Association of Computer Science &<br class="reference-break"> Engineering</h2></div><div><p class="hero-tagline"><%= siteSettings.tagline %></p><div class="button-row"><a class="button" href="#events">Explore Events ↗</a><a class="button button-outline" href="#join-contact">Join / Contact →</a></div></div></div><a class="hero-scroll" href="#about"><span aria-hidden="true">↓</span> SCROLL TO EXPLORE</a>
 </section>
-<% if(announcement.published) { %><section id="announcement" class="announcement-banner" aria-labelledby="announcement-title"><span class="eyebrow">CIPHER / ANNOUNCEMENT</span><h2 id="announcement-title"><%= announcement.title %></h2><p class="preserve-lines"><%= announcement.message %></p><% if(announcement.link) { %><a class="text-link" href="<%= announcement.link %>" rel="noopener noreferrer">Find out more &rarr;</a><% } %></section><% } %>
 <section class="reference-section reference-about" id="about">
   <div><p class="eyebrow">// ABOUT</p><h2 data-decode>Who we are</h2><p class="reference-about-copy"><strong>CIPHER</strong><%= reference.about.slice(6) %></p></div>
   <div class="reference-collage" aria-label="CIPHER event photographs">
