@@ -52,8 +52,8 @@ Testing: Node’s built-in test runner, Playwright, and axe-core accessibility t
 
 Live link: https://cipher-buildblazer-chi.vercel.app/
 
-## Admin Login
-
+## Admin Page Login
+url=https://cipher-buildblazer-chi.vercel.app/admin/login
 Username: editor
 Password: cipher@123
 
