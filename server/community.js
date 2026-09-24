@@ -40,6 +40,14 @@ export function answerWebsiteQuestion(question,{events,team,activities,domains,s
 }
 
 export function communityRoutes(app,{db,requireAdmin,listContent}){
+  app.delete('/api/admin/announcement',requireAdmin,async(req,res)=>{
+    const {version}=req.body;
+    if(!Number.isSafeInteger(version)||version<1)return res.status(422).json({error:'Reload the announcement before deleting.'});
+    const result=await db.collection('settings').updateOne({key:'announcement',version},{$set:{value:{title:'',message:'',link:'',published:false}},$inc:{version:1}});
+    if(!result.matchedCount)return res.status(409).json({error:'Announcement changed. Reload before deleting.'});
+    await db.collection('admin_activity').insertOne({actor:req.session.username,action:'DELETE_ANNOUNCEMENT',path:'/api/admin/announcement',created_at:new Date().toISOString()});
+    res.json({ok:true,message:'Announcement deleted.'});
+  });
   app.put('/api/admin/announcement',requireAdmin,async(req,res)=>{
     const {title,message,link='',published,version}=req.body;
     if(typeof title!=='string'||typeof message!=='string'||typeof link!=='string'||title.trim().length>120||message.trim().length>1500||link.length>500||/[<>\x00-\x08]/.test(title+message)||typeof published!=='boolean'||!Number.isSafeInteger(version)||version<0||published&&(!title.trim()||!message.trim()))return res.status(422).json({error:'Use a title (up to 120 characters) and message (up to 1,500 characters) before publishing.'});
@@ -50,7 +58,7 @@ export function communityRoutes(app,{db,requireAdmin,listContent}){
       if(!result.matchedCount&&!result.upsertedCount)return res.status(409).json({error:'Announcement changed in another session. Reload before saving.'});
     }catch(error){if(error.code===11000)return res.status(409).json({error:'Announcement changed in another session. Reload before saving.'});throw error;}
     await db.collection('admin_activity').insertOne({actor:req.session.username,action:'UPDATE_ANNOUNCEMENT',path:'/api/admin/announcement',created_at:new Date().toISOString()});
-    res.json({ok:true,message:published?'Announcement published above the homepage content.':'Announcement saved and hidden from visitors.'});
+    res.json({ok:true,message:published?'Announcement published below the homepage hero.':'Announcement saved and hidden from visitors.'});
   });
   app.post('/api/chat',rateLimit({windowMs:15*60*1000,limit:40,standardHeaders:'draft-8',legacyHeaders:false,message:{error:'Please wait before asking more questions.'}}),async(req,res)=>{
     if(typeof req.body.question!=='string'||!req.body.question.trim()||req.body.question.length>500)return res.status(422).json({error:'Ask a question of 1–500 characters.'});
