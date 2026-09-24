@@ -1,6 +1,5 @@
 import express from 'express';
 import {communityRoutes,readAnnouncement} from './community.js';
-import {recoveryRoutes} from './recovery.js';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import sharp from 'sharp';
@@ -921,7 +920,6 @@ export async function createApp(options = {}) {
 
         res.render('admin', {
           announcement:await readAnnouncement(db),
-          recoveryEmail:(await db.collection('admins').findOne({username:_req.session.username}))?.recovery_email||'',
           title: 'Content studio',
           description:
             'Manage CIPHER events, activities, leadership, and applications.',
@@ -946,7 +944,6 @@ export async function createApp(options = {}) {
   );
 
   communityRoutes(app,{db,requireAdmin,listContent});
-  recoveryRoutes(app,{db,mail,auth,requireAdmin,baseUrl});
   app.use('/api/admin',requireAdmin);
   studioRoutes(app,{db,requireAdmin,auth,listContent});
   app.use('/admin',requireAdmin);

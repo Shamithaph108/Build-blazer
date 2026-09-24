@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import {once} from 'node:events';
 import {createApp} from '../server/app.js';
 import {createTestDatabase} from './mongo-fixture.js';
-import {hashPassword,verifyPassword,digest} from '../server/security.js';
+import {hashPassword} from '../server/security.js';
 
-test('announcements, public-only chat and verified single-use password recovery',async t=>{
+test('announcements, public-only chat and removed recovery endpoints',async t=>{
   const fixture=await createTestDatabase();t.after(()=>fixture.close());
   const delivered=[],origin='http://localhost:3456',password='test-original-password';
   const app=await createApp({db:fixture.db,baseUrl:origin,mail:{env:{MAIL_FROM:'test@example.com'},transport:{sendMail:async m=>{delivered.push(m);return {accepted:[m.to.address]};}}}});
@@ -36,23 +36,11 @@ test('announcements, public-only chat and verified single-use password recovery'
   assert.equal((await request('/api/admin/announcement',{version:1},'DELETE')).status,409);
   assert.equal((await request('/api/admin/announcement',{version:3},'DELETE')).status,200);
   const cleared=await fixture.db.collection('settings').findOne({key:'announcement'});assert.equal(cleared.value.message,'');assert.equal(cleared.value.published,false);
-  assert.equal((await request('/api/admin/recovery-email',{email:'recover@example.com',currentPassword:'wrong'})).status,422);
-  assert.equal((await request('/api/admin/recovery-email',{email:'recover@example.com',currentPassword:password})).status,200);
-  let user=await fixture.db.collection('admins').findOne({username:'recovery-editor'});assert.equal(user.recovery_email,undefined);
-  const verification=new URL(delivered.at(-1).text.match(/http[^\s]+/)[0]);const verifyToken=verification.searchParams.get('token');
-  assert.equal(user.pending_recovery.hash,digest(verifyToken));assert.equal(await fixture.db.collection('outbox').countDocuments({}),0);
-  assert.equal((await request(verification.pathname+verification.search)).status,200);
-  user=await fixture.db.collection('admins').findOne({username:'recovery-editor'});assert.equal(user.recovery_email,undefined,'GET must not verify');
-  assert.equal((await request('/admin/verify-recovery',{token:verifyToken})).status,200);
-  assert.equal((await request('/admin/verify-recovery',{token:verifyToken})).status,400);
-  await request('/admin/forgot-password');const missing=await request('/admin/forgot-password',{username:'unknown'});const known=await request('/admin/forgot-password',{username:'recovery-editor'});assert.equal(known.text,missing.text);
-  for(let i=0;i<50&&delivered.length<2;i++)await new Promise(r=>setTimeout(r,20));
-  assert.equal(delivered.length,2);const reset=new URL(delivered[1].text.match(/http[^\s]+/)[0]);const token=reset.searchParams.get('token');
-  assert.equal((await request(reset.pathname+reset.search)).status,200);
-  assert.equal((await request('/admin/reset-password',{token,password:'short',confirmPassword:'short'})).status,422);
-  assert.equal((await request('/admin/reset-password',{token,password:'new-password-123',confirmPassword:'new-password-123'})).status,200);
-  assert.equal(await fixture.db.collection('sessions').countDocuments({username:'recovery-editor'}),0);
-  user=await fixture.db.collection('admins').findOne({username:'recovery-editor'});assert.equal(await verifyPassword('new-password-123',user.password_hash),true);assert.equal(await verifyPassword(password,user.password_hash),false);assert.equal(user.pending_reset,undefined);
-  await request('/admin/reset-password');assert.equal((await request('/admin/reset-password',{token,password:'other-password',confirmPassword:'other-password'})).status,400);
-  assert.equal(await fixture.db.collection('outbox').countDocuments({}),0);
+  for(const route of ['/admin/forgot-password','/admin/reset-password','/admin/verify-recovery','/api/admin/recovery-email']){
+    assert.equal((await request(route)).status,404);
+    assert.equal((await request(route,{token:'unused',username:'recovery-editor'})).status,404);
+  }
+  assert.equal(delivered.length,0);
+  assert.doesNotMatch((await request('/admin')).text,/Password recovery|recovery-email-form/);
+  assert.doesNotMatch((await request('/admin/login')).text,/Forgot password/);
 });

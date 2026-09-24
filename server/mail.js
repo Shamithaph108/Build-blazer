@@ -279,11 +279,6 @@ export function createMailService(db, { env = process.env, transport } = {}) {
 
   return {
     configured,
-    async sendSecurityEmail({recipient,subject,body}) {
-      if(!configured||!address(recipient))throw new Error('Security email unavailable');
-      const result=await sender.sendMail({from:{name:'CIPHER',address:from},to:{address:recipient},subject,text:body,disableFileAccess:true,disableUrlAccess:true});
-      if(!result.accepted?.length)throw new Error('Security email not accepted');
-    },
     notificationsConfigured: address(notify),
     queue,
     send,

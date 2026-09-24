@@ -1,9 +1,0 @@
-<%- include('partials/head') %>
-<section class="section wrap login-wrap"><div class="form-panel"><p class="eyebrow">CIPHER / ACCOUNT RECOVERY</p><h1><%= mode==='forgot'?'Forgot password?':mode==='reset'?'Choose a new password':mode==='verify'?'Verify recovery email':'Account recovery' %></h1>
-<% if(message) { %><p class="notice" role="status"><%= message %></p><% } %>
-<% if(mode!=='done') { %><form method="post" action="/admin/<%= mode==='forgot'?'forgot-password':mode==='reset'?'reset-password':'verify-recovery' %>"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="token" value="<%= token %>">
-<% if(mode==='forgot') { %><p>Enter your admin username. A reset link will be sent to your verified recovery email, if configured.</p><label>Username<input name="username" required maxlength="80" autocomplete="username"></label><% } %>
-<% if(mode==='reset') { %><label>New password<input name="password" type="password" required minlength="8" maxlength="256" autocomplete="new-password"></label><label>Confirm password<input name="confirmPassword" type="password" required minlength="8" maxlength="256" autocomplete="new-password"></label><% } %>
-<% if(mode==='verify') { %><p>Confirm that you want to use this email address for password recovery. Links expire after 15 minutes.</p><% } %>
-<button class="button" type="submit"><%= mode==='forgot'?'Send reset link':mode==='reset'?'Reset password':'Verify email' %></button></form><% } %><p><a class="text-link" href="/admin/login">Back to sign in</a></p></div></section>
-<%- include('partials/footer') %>
