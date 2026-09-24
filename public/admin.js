@@ -151,8 +151,9 @@ for(const button of document.querySelectorAll('[data-retry-mail]'))button.addEve
   action(button.closest('article'),async()=>{const result=await request('/api/admin/outbox/'+button.dataset.retryMail+'/retry','POST',{});saved(result.message || 'Email status: '+result.status,result.status==='failed'?'error':'success');});
 });
 document.querySelector('[data-delete-all-mail]')?.addEventListener('click',async event=>{
+  const toolbar=event.currentTarget.closest('.outbox-toolbar');
   if(!await confirmAction('Delete every outgoing email record? Queued delivery will be cancelled. Messages already accepted by the mail server cannot be recalled.'))return;
-  action(event.currentTarget.closest('.outbox-toolbar'),async()=>{
+  action(toolbar,async()=>{
     const result=await request('/api/admin/outbox','DELETE',{});
     saved(result.message);
   });

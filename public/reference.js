@@ -162,6 +162,17 @@
   new IntersectionObserver(entries=>trackVisible=entries[0].isIntersecting).observe(trackWindow);
   const originals=[...track.children];let trackOffset=0,trackLength=0,trackPaused=false,manualTrackPause=false,drag=null;
   const carouselManaged=track.hasAttribute('data-carousel');
+  const pauseControl=document.querySelector('[data-team-pause]');
+  function setTrackPaused(paused){manualTrackPause=paused;pauseControl?.setAttribute('aria-pressed',String(paused));if(pauseControl)pauseControl.textContent=paused?'Resume scroll':'Pause scroll';}
+  pauseControl?.addEventListener('click',()=>setTrackPaused(!manualTrackPause));
+  document.querySelectorAll('[data-team-step]').forEach(button=>button.addEventListener('click',()=>{
+    if(carouselManaged||!originals.length)return;
+    measureTrack();setTrackPaused(true);
+    const step=originals.length>1?originals[1].offsetLeft-originals[0].offsetLeft:originals[0].offsetWidth;
+    const length=trackLength||step*originals.length;
+    trackOffset=((Math.round(trackOffset/step)+Number(button.dataset.teamStep))*step%length+length)%length;
+    track.style.transform=`translateX(${-trackOffset}px)`;
+  }));
   if(!carouselManaged&&originals.length>1){originals.forEach(card=>{const clone=card.cloneNode(true);clone.dataset.clone='true';clone.setAttribute('aria-hidden','true');clone.querySelectorAll('template').forEach(t=>t.remove());clone.querySelectorAll('button,a').forEach(control=>control.tabIndex=-1);track.append(clone);});}
   function measureTrack(){const firstClone=track.querySelector('[data-clone]');trackLength=firstClone?firstClone.offsetLeft-originals[0].offsetLeft:0;}
   if(!carouselManaged){

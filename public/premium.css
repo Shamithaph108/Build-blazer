@@ -1387,7 +1387,7 @@ input[type=checkbox]{accent-color:#95ffb5}
   margin-top:18px
 }
 
-.profile-detail:not(:has(>img)){grid-template-columns:1fr}
+.profile-detail:not(:has(>img,>.matrix-profile-photo)){grid-template-columns:1fr}
 
 .reference-site #detail-dialog[data-kind=profile] #dialog-content{
   max-height:90dvh
@@ -2801,4 +2801,23 @@ input[type=checkbox]{accent-color:#95ffb5}
   .reference-site .footer-grid p{margin-inline:auto}
   .reference-site .footer-socials{justify-content:center}
   .reference-site .footer-bottom{justify-content:center;text-align:center;gap:14px}
+}
+
+/* Give wrapped portraits and the complete biography their own bounded space. */
+#detail-dialog[data-kind=profile] #dialog-content{padding:24px;max-height:calc(88dvh - 65px);overflow-y:auto}
+.reference-site #detail-dialog[data-kind=profile] #dialog-content{padding:24px;max-height:calc(88dvh - 65px)}
+#detail-dialog .profile-detail{grid-template-columns:minmax(0,.85fr) minmax(0,1fr);align-items:start;gap:24px}
+#detail-dialog .profile-detail:not(:has(.matrix-profile-photo)){grid-template-columns:1fr}
+#detail-dialog .matrix-profile-photo img{max-height:55dvh;object-fit:contain}
+#detail-dialog .profile-detail>div:last-child{min-width:0;text-align:center;overflow-wrap:anywhere;padding:12px}
+#detail-dialog .profile-socials{justify-content:center;flex-wrap:wrap}
+.admin-site .gallery-choices{grid-auto-rows:max-content;align-content:start}
+.admin-site .photo-option{align-self:start;min-width:0}
+.admin-site .photo-actions{display:grid;grid-template-columns:36px minmax(0,1fr) 36px 36px;min-height:44px}
+.admin-site .photo-actions button{display:block;min-width:0;min-height:44px;white-space:normal;line-height:1.3;color:#d7fae2}
+@media(max-width:800px){
+  #detail-dialog .profile-detail{grid-template-columns:minmax(0,1fr);gap:12px}
+  #detail-dialog .matrix-profile-photo img{max-height:38dvh}
+  #detail-dialog[data-kind=profile] #dialog-content,.reference-site #detail-dialog[data-kind=profile] #dialog-content{padding:18px;max-height:calc(88dvh - 65px)}
+  .admin-site .gallery-choices{grid-template-columns:minmax(0,1fr)}
 }
