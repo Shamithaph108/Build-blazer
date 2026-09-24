@@ -50,7 +50,12 @@ Testing: Node’s built-in test runner, Playwright, and axe-core accessibility t
 
 ## Deployment
 
-Live link: _add once deployed_
+Live link: https://cipher-buildblazer-chi.vercel.app/
+
+## Admin Login
+
+Username: editor
+Password: cipher@123
 
 ## Rules
 
@@ -60,3 +65,5 @@ Live link: _add once deployed_
 
 ---
 Organized by **Cipher (CSE Association)**, SJEC, in collaboration with **AgentBlazer Club**.
+
+
